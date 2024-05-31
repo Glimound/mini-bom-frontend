@@ -9,7 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@vue/reactivity": "^3.4.27",
+    "@vue/shared": "^3.4.27",
+    "axios": "^1.7.2",
+    "element-plus": "^2.7.3",
     "pinia": "^2.1.7",
+    "sass": "^1.77.4",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
   },
