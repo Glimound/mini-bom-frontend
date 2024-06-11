@@ -48,7 +48,7 @@
       <el-form-item>
         <div class="toggle-area">
           <el-button @click="toggleChange" class="button-text" type="primary" link>{{ loginTypeButtonText }}</el-button>
-          <el-button class="button-text" type="primary" link>忘记密码</el-button>
+          <el-button @click="routeToRegister" class="button-text" type="primary" link>注册帐号</el-button>
         </div>
       </el-form-item>
     </el-form>
@@ -58,6 +58,7 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { User, Lock, Message } from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router';
 
 const loginForm = ref({
   account: '',
@@ -78,6 +79,7 @@ const error = ref(false)
 const errorMessage = ref("")
 let emailGetCodeTimer = null
 let phoneGetCodeTimer = null
+const router = useRouter()
 
 const getCodeDesc = computed(() => {
   if (emailLoginToggle.value) {
@@ -238,6 +240,10 @@ function login() {
 
     // commit
   }
+}
+
+function routeToRegister() {
+  router.push('/register')
 }
 </script>
 
