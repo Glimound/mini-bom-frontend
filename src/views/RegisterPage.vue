@@ -56,9 +56,12 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed } from 'vue'
 import { User, Lock, Message } from '@element-plus/icons-vue'
-import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { UserService } from '@/services/apiServices'
+import { ElMessage } from 'element-plus'
 
 const registerForm = ref({
   account: '',
@@ -80,6 +83,7 @@ const errorMessage = ref("")
 let emailGetCodeTimer = null
 let phoneGetCodeTimer = null
 const router = useRouter()
+const authStore = useAuthStore()
 
 const getCodeDesc = computed(() => {
   if (emailRegisterToggle.value) {
@@ -126,12 +130,12 @@ function toggleChange() {
 function getCode() {
   if (emailRegisterToggle.value) {
     // check
-    if (!loginForm.value.account) {
+    if (!registerForm.value.account) {
       error.value = true
       errorMessage.value = "邮箱不能为空"
       return
     }
-    if (!loginForm.value.password) {
+    if (!registerForm.value.password) {
       error.value = true
       errorMessage.value = "密码不能为空"
       return
@@ -143,18 +147,31 @@ function getCode() {
     emailGetCodeLoading.value = true
 
     // get code
-
-    // set text
-    emailGetCodeLoading.value = false
-    emailGetCodeCountDown.value = 60
-    emailGetCodeTimer = setInterval(() => {
-      emailGetCodeCountDown.value -= 1
-      if (emailGetCodeCountDown.value <= 0) {
-        clearInterval(emailGetCodeTimer)
-        emailGetCodeTimer = null
-        emailGetCodeDisabled.value = false
+    UserService.getCodeRegister({
+      "email": registerForm.value.account,
+      "password": registerForm.value.password
+    }).then(({data}) => {
+      if (data.code !== 200) {
+        error.value = true
+        errorMessage.value = data.message
       }
-    }, 1000)
+
+      // set text
+      emailGetCodeLoading.value = false
+      if (error.value) {
+        emailGetCodeDisabled.value = false
+        return
+      }
+      emailGetCodeCountDown.value = 60
+      emailGetCodeTimer = setInterval(() => {
+        emailGetCodeCountDown.value -= 1
+        if (emailGetCodeCountDown.value <= 0) {
+          clearInterval(emailGetCodeTimer)
+          emailGetCodeTimer = null
+          emailGetCodeDisabled.value = false
+        }
+      }, 1000)
+    })
   } else {
     // check
     if (!registerForm.value.account) {
@@ -174,18 +191,31 @@ function getCode() {
     phoneGetCodeLoading.value = true
 
     // get code
-
-    // set text
-    phoneGetCodeLoading.value = false
-    phoneGetCodeCountDown.value = 60
-    phoneGetCodeTimer = setInterval(() => {
-      phoneGetCodeCountDown.value -= 1
-      if (phoneGetCodeCountDown.value <= 0) {
-        clearInterval(phoneGetCodeTimer)
-        phoneGetCodeTimer = null
-        phoneGetCodeDisabled.value = false
+    UserService.getCodeRegister({
+      "telephone": registerForm.value.account,
+      "password": registerForm.value.password
+    }).then(({data}) => {
+      if (data.code !== 200) {
+        error.value = true
+        errorMessage.value = data.message
       }
-    }, 1000)
+
+      // set text
+      phoneGetCodeLoading.value = false
+      if (error.value) {
+        phoneGetCodeDisabled.value = false
+        return
+      }
+      phoneGetCodeCountDown.value = 60
+      phoneGetCodeTimer = setInterval(() => {
+        phoneGetCodeCountDown.value -= 1
+        if (phoneGetCodeCountDown.value <= 0) {
+          clearInterval(phoneGetCodeTimer)
+          phoneGetCodeTimer = null
+          phoneGetCodeDisabled.value = false
+        }
+      }, 1000)
+    })
   }
 }
 
@@ -211,10 +241,23 @@ function register() {
     // set status
     error.value = false
 
-    // get code
-
-    // commit
-
+    // register
+    UserService.register({
+      "email": registerForm.value.account,
+      "code": registerForm.value.code
+    }).then(({data}) => {
+      if (data.code !== 200) {
+        error.value = true
+        errorMessage.value = data.message
+      } else {
+        authStore.login(data.data.token, data.data.uid)
+        ElMessage({
+          message: '注册成功',
+          type: 'success',
+        })
+        router.push('/')
+      }
+    })
   } else {
     // check
     if (!registerForm.value.account) {
@@ -236,9 +279,23 @@ function register() {
     // set status
     error.value = false
 
-    // get code
-
-    // commit
+    // register
+    UserService.register({
+      "telephone": registerForm.value.account,
+      "code": registerForm.value.code
+    }).then(({data}) => {
+      if (data.code !== 200) {
+        error.value = true
+        errorMessage.value = data.message
+      } else {
+        authStore.login(data.data.token, data.data.uid)
+        ElMessage({
+          message: '注册成功',
+          type: 'success',
+        })
+        router.push('/login')
+      }
+    })
   }
 }
 
