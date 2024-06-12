@@ -7,5 +7,7 @@ import { RouterView } from 'vue-router';
 </template>
 
 <style>
-
+body {
+  margin: 0px
+}
 </style>
