@@ -3,9 +3,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 import DashboardPage from '@/views/DashboardPage.vue'
 import LoginPage from '@/views/LoginPage.vue'
 import RegisterPage from '@/views/RegisterPage.vue'
-import PartManagement from '@/views/ContentView/PartManagement.vue'
-import BomManagement from '@/views/ContentView/BomManagement.vue'
-import ClassficationManagement from '@/views/ContentView/ClassficationManagement.vue'
+import PartManagement from '@/views/ContentView.vue/PartManagement.vue'
+import BomManagement from '@/views/ContentView.vue/BomManagement.vue'
+import ClassficationManagement from '@/views/ContentView.vue/ClassificationManagement.vue'
+import AttributeManagement from '@/views/ContentView.vue/AttributeManagement.vue'
 
 
 const router = createRouter({
@@ -52,11 +53,19 @@ const router = createRouter({
       }
     },
     {
-      path: '/classficationManagement',
-      name: 'ClassficationManagement',
+      path: '/classificationManagement',
+      name: 'ClassificationManagement',
       component: ClassficationManagement,
       meta: {
         title: '分类管理'
+      }
+    },
+    {
+      path: '/attributeManagement',
+      name: 'AttributeManagement',
+      component: AttributeManagement,
+      meta: {
+        title: '属性管理'
       }
     }
   ]

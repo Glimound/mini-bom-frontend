@@ -1,5 +1,5 @@
 <template>
-    <div class="part-management">
+    <div class="attribute-management">
         <el-container>
             <el-header>
                 <TheBreadcrumb />
