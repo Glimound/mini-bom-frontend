@@ -43,7 +43,15 @@
         </el-button>
       </el-form-item>
       <el-form-item>
-        <el-button class="button-login" type="primary" @click="login">登 录</el-button>
+        <el-button
+          :disabled="loginDisabled"
+          :loading="loginLoading"
+          class="button-login"
+          type="primary"
+          @click="login"
+        >
+          登 录
+        </el-button>
       </el-form-item>
       <el-form-item>
         <div class="toggle-area">
@@ -73,6 +81,8 @@ const emailGetCodeDisabled = ref(false)
 const phoneGetCodeDisabled = ref(false)
 const emailGetCodeLoading = ref(false)
 const phoneGetCodeLoading = ref(false)
+const loginLoading = ref(false)
+const loginDisabled = ref(false)
 const accountPlaceholder = ref('邮箱')
 const codePlaceholder = ref('邮箱验证码')
 const loginTypeButtonText = ref('短信登录')
@@ -250,12 +260,16 @@ function login() {
     
     // set status
     error.value = false
+    loginLoading.value = true
+    loginDisabled.value = true
 
     // login
     UserService.login({
       "email": loginForm.value.account,
       "code": loginForm.value.code
     }).then(({data}) => {
+      loginLoading.value = false
+      loginDisabled.value = false
       if (data.code !== 200) {
         error.value = true
         errorMessage.value = data.message
@@ -270,6 +284,8 @@ function login() {
     }).catch((err) => {
       error.value = true
       errorMessage.value = err.message
+      loginLoading.value = false
+      loginDisabled.value = false
     })
   } else {
     // check
@@ -291,12 +307,16 @@ function login() {
 
     // set status
     error.value = false
+    loginLoading.value = true
+    loginDisabled.value = true
 
     // login
     UserService.login({
       "telephone": loginForm.value.account,
       "code": loginForm.value.code
     }).then(({data}) => {
+      loginLoading.value = false
+      loginDisabled.value = false
       if (data.code !== 200) {
         error.value = true
         errorMessage.value = data.message
@@ -311,6 +331,8 @@ function login() {
     }).catch((err) => {
       error.value = true
       errorMessage.value = err.message
+      loginLoading.value = false
+      loginDisabled.value = false
     })
   }
 }
