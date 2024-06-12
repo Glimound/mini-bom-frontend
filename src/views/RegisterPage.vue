@@ -171,6 +171,11 @@ function getCode() {
           emailGetCodeDisabled.value = false
         }
       }, 1000)
+    }).catch((err) => {
+      error.value = true
+      errorMessage.value = err.message
+      emailGetCodeLoading.value = false
+      emailGetCodeDisabled.value = false
     })
   } else {
     // check
@@ -215,6 +220,11 @@ function getCode() {
           phoneGetCodeDisabled.value = false
         }
       }, 1000)
+    }).catch((err) => {
+      error.value = true
+      errorMessage.value = err.message
+      phoneGetCodeLoading.value = false
+      phoneGetCodeDisabled.value = false
     })
   }
 }
@@ -252,11 +262,14 @@ function register() {
       } else {
         authStore.login(data.data.token, data.data.uid)
         ElMessage({
-          message: '注册成功',
+          message: '注册成功，已为您自动登录',
           type: 'success',
         })
         router.push('/')
       }
+    }).catch((err) => {
+      error.value = true
+      errorMessage.value = err.message
     })
   } else {
     // check
@@ -290,11 +303,14 @@ function register() {
       } else {
         authStore.login(data.data.token, data.data.uid)
         ElMessage({
-          message: '注册成功',
+          message: '注册成功，已为您自动登录',
           type: 'success',
         })
-        router.push('/login')
+        router.push('/')
       }
+    }).catch((err) => {
+      error.value = true
+      errorMessage.value = err.message
     })
   }
 }

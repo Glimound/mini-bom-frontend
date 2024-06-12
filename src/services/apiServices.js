@@ -64,5 +64,11 @@ export const UserService = {
   },
   register(params) {
     return ApiService.post('/user/register_verify', params)
-  }
+  },
+  getCodeLogin(params) {
+    return ApiService.post('/user/login', params)
+  },
+  login(params) {
+    return ApiService.post('/user/login_verify', params)
+  },
 }
