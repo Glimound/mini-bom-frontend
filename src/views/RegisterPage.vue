@@ -43,7 +43,15 @@
         </el-button>
       </el-form-item>
       <el-form-item>
-        <el-button class="button-register" type="primary" @click="register">注 册</el-button>
+        <el-button
+          :disabled="registerDisabled"
+          :loading="registerLoading"
+          class="button-register"
+          type="primary"
+          @click="register"
+        >
+          注 册
+        </el-button>
       </el-form-item>
       <el-form-item>
         <div class="toggle-area">
@@ -73,6 +81,8 @@ const emailGetCodeDisabled = ref(false)
 const phoneGetCodeDisabled = ref(false)
 const emailGetCodeLoading = ref(false)
 const phoneGetCodeLoading = ref(false)
+const registerLoading = ref(false)
+const registerDisabled = ref(false)
 const accountPlaceholder = ref('邮箱')
 const codePlaceholder = ref('邮箱验证码')
 const registerTypeButtonText = ref('手机号注册')
@@ -171,6 +181,11 @@ function getCode() {
           emailGetCodeDisabled.value = false
         }
       }, 1000)
+    }).catch((err) => {
+      error.value = true
+      errorMessage.value = err.message
+      emailGetCodeLoading.value = false
+      emailGetCodeDisabled.value = false
     })
   } else {
     // check
@@ -215,6 +230,11 @@ function getCode() {
           phoneGetCodeDisabled.value = false
         }
       }, 1000)
+    }).catch((err) => {
+      error.value = true
+      errorMessage.value = err.message
+      phoneGetCodeLoading.value = false
+      phoneGetCodeDisabled.value = false
     })
   }
 }
@@ -240,23 +260,32 @@ function register() {
     
     // set status
     error.value = false
+    registerLoading.value = true
+    registerDisabled.value = true
 
     // register
     UserService.register({
       "email": registerForm.value.account,
       "code": registerForm.value.code
     }).then(({data}) => {
+      registerLoading.value = false
+      registerDisabled.value = false
       if (data.code !== 200) {
         error.value = true
         errorMessage.value = data.message
       } else {
         authStore.login(data.data.token, data.data.uid)
         ElMessage({
-          message: '注册成功',
+          message: '注册成功，已为您自动登录',
           type: 'success',
         })
         router.push('/')
       }
+    }).catch((err) => {
+      error.value = true
+      errorMessage.value = err.message
+      registerLoading.value = false
+      registerDisabled.value = false
     })
   } else {
     // check
@@ -278,23 +307,32 @@ function register() {
 
     // set status
     error.value = false
+    registerLoading.value = true
+    registerDisabled.value = true
 
     // register
     UserService.register({
       "telephone": registerForm.value.account,
       "code": registerForm.value.code
     }).then(({data}) => {
+      registerLoading.value = false
+      registerDisabled.value = false
       if (data.code !== 200) {
         error.value = true
         errorMessage.value = data.message
       } else {
         authStore.login(data.data.token, data.data.uid)
         ElMessage({
-          message: '注册成功',
+          message: '注册成功，已为您自动登录',
           type: 'success',
         })
-        router.push('/login')
+        router.push('/')
       }
+    }).catch((err) => {
+      error.value = true
+      errorMessage.value = err.message
+      registerLoading.value = false
+      registerDisabled.value = false
     })
   }
 }

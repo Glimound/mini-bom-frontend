@@ -81,4 +81,10 @@ router.beforeEach((to, from) => {
   }
 })
 
+router.beforeEach((to, from) => {
+  if (!authStore.authenticated && to.name !== 'LoginPage' && to.name !== 'RegisterPage') {
+    return { name: 'LoginPage' }
+  }
+})
+
 export default router

@@ -43,7 +43,15 @@
         </el-button>
       </el-form-item>
       <el-form-item>
-        <el-button class="button-login" type="primary" @click="login">登 录</el-button>
+        <el-button
+          :disabled="loginDisabled"
+          :loading="loginLoading"
+          class="button-login"
+          type="primary"
+          @click="login"
+        >
+          登 录
+        </el-button>
       </el-form-item>
       <el-form-item>
         <div class="toggle-area">
@@ -59,6 +67,9 @@
 import { ref, computed } from 'vue';
 import { User, Lock, Message } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router';
+import { UserService } from '@/services/apiServices';
+import { useAuthStore } from '@/stores/auth'
+import { ElMessage } from 'element-plus';
 
 const loginForm = ref({
   account: '',
@@ -70,6 +81,8 @@ const emailGetCodeDisabled = ref(false)
 const phoneGetCodeDisabled = ref(false)
 const emailGetCodeLoading = ref(false)
 const phoneGetCodeLoading = ref(false)
+const loginLoading = ref(false)
+const loginDisabled = ref(false)
 const accountPlaceholder = ref('邮箱')
 const codePlaceholder = ref('邮箱验证码')
 const loginTypeButtonText = ref('短信登录')
@@ -80,6 +93,7 @@ const errorMessage = ref("")
 let emailGetCodeTimer = null
 let phoneGetCodeTimer = null
 const router = useRouter()
+const authStore = useAuthStore()
 
 const getCodeDesc = computed(() => {
   if (emailLoginToggle.value) {
@@ -143,18 +157,36 @@ function getCode() {
     emailGetCodeLoading.value = true
 
     // get code
-
-    // set text
-    emailGetCodeLoading.value = false
-    emailGetCodeCountDown.value = 60
-    emailGetCodeTimer = setInterval(() => {
-      emailGetCodeCountDown.value -= 1
-      if (emailGetCodeCountDown.value <= 0) {
-        clearInterval(emailGetCodeTimer)
-        emailGetCodeTimer = null
-        emailGetCodeDisabled.value = false
+    UserService.getCodeLogin({
+      "email": loginForm.value.account,
+      "password": loginForm.value.password
+    }).then(({data}) => {
+      if (data.code !== 200) {
+        error.value = true
+        errorMessage.value = data.message
       }
-    }, 1000)
+
+      // set text
+      emailGetCodeLoading.value = false
+      if (error.value) {
+        emailGetCodeDisabled.value = false
+        return
+      }
+      emailGetCodeCountDown.value = 60
+      emailGetCodeTimer = setInterval(() => {
+        emailGetCodeCountDown.value -= 1
+        if (emailGetCodeCountDown.value <= 0) {
+          clearInterval(emailGetCodeTimer)
+          emailGetCodeTimer = null
+          emailGetCodeDisabled.value = false
+        }
+      }, 1000)
+    }).catch((err) => {
+      error.value = true
+      errorMessage.value = err.message
+      emailGetCodeLoading.value = false
+      emailGetCodeDisabled.value = false
+    })
   } else {
     // check
     if (!loginForm.value.account) {
@@ -174,18 +206,36 @@ function getCode() {
     phoneGetCodeLoading.value = true
 
     // get code
-
-    // set text
-    phoneGetCodeLoading.value = false
-    phoneGetCodeCountDown.value = 60
-    phoneGetCodeTimer = setInterval(() => {
-      phoneGetCodeCountDown.value -= 1
-      if (phoneGetCodeCountDown.value <= 0) {
-        clearInterval(phoneGetCodeTimer)
-        phoneGetCodeTimer = null
-        phoneGetCodeDisabled.value = false
+    UserService.getCodeLogin({
+      "telephone": loginForm.value.account,
+      "password": loginForm.value.password
+    }).then(({data}) => {
+      if (data.code !== 200) {
+        error.value = true
+        errorMessage.value = data.message
       }
-    }, 1000)
+
+      // set text
+      phoneGetCodeLoading.value = false
+      if (error.value) {
+        phoneGetCodeDisabled.value = false
+        return
+      }
+      phoneGetCodeCountDown.value = 60
+      phoneGetCodeTimer = setInterval(() => {
+        phoneGetCodeCountDown.value -= 1
+        if (phoneGetCodeCountDown.value <= 0) {
+          clearInterval(phoneGetCodeTimer)
+          phoneGetCodeTimer = null
+          phoneGetCodeDisabled.value = false
+        }
+      }, 1000)
+    }).catch((err) => {
+      error.value = true
+      errorMessage.value = err.message
+      phoneGetCodeLoading.value = false
+      phoneGetCodeDisabled.value = false
+    })
   }
 }
 
@@ -210,11 +260,33 @@ function login() {
     
     // set status
     error.value = false
+    loginLoading.value = true
+    loginDisabled.value = true
 
-    // get code
-
-    // commit
-
+    // login
+    UserService.login({
+      "email": loginForm.value.account,
+      "code": loginForm.value.code
+    }).then(({data}) => {
+      loginLoading.value = false
+      loginDisabled.value = false
+      if (data.code !== 200) {
+        error.value = true
+        errorMessage.value = data.message
+      } else {
+        authStore.login(data.data.token, data.data.uid)
+        ElMessage({
+          message: '登录成功',
+          type: 'success'
+        })
+        router.push('/')
+      }
+    }).catch((err) => {
+      error.value = true
+      errorMessage.value = err.message
+      loginLoading.value = false
+      loginDisabled.value = false
+    })
   } else {
     // check
     if (!loginForm.value.account) {
@@ -235,10 +307,33 @@ function login() {
 
     // set status
     error.value = false
+    loginLoading.value = true
+    loginDisabled.value = true
 
-    // get code
-
-    // commit
+    // login
+    UserService.login({
+      "telephone": loginForm.value.account,
+      "code": loginForm.value.code
+    }).then(({data}) => {
+      loginLoading.value = false
+      loginDisabled.value = false
+      if (data.code !== 200) {
+        error.value = true
+        errorMessage.value = data.message
+      } else {
+        authStore.login(data.data.token, data.data.uid)
+        ElMessage({
+          message: '登录成功',
+          type: 'success'
+        })
+        router.push('/')
+      }
+    }).catch((err) => {
+      error.value = true
+      errorMessage.value = err.message
+      loginLoading.value = false
+      loginDisabled.value = false
+    })
   }
 }
 
