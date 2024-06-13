@@ -48,18 +48,18 @@ const currentRoute = computed(() => {
   }
 
   .el-menu-item {
-    i {
-      margin-right: 10px;
-    }
+    height: 40px;
   }
 
-  .el-submenu {
-    i {
-      margin-right: 10px;
+  .el-sub-menu {
+    height: 40px;
+
+    .el-sub-menu__title {
+      height: 40px;
     }
 
     .el-menu-item {
-      margin-left: 10px;
+      height: 40px;
     }
   }
 }

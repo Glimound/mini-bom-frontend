@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { getJwtToken } from '@/services/jwtServices'
+import { useAuthStore } from '@/stores/auth'
 
 import DashboardPage from '@/views/DashboardPage.vue'
 import LoginPage from '@/views/LoginPage.vue'
@@ -8,6 +10,8 @@ import BomManagement from '@/views/ContentView.vue/BomManagement.vue'
 import ClassficationManagement from '@/views/ContentView.vue/ClassificationManagement.vue'
 import AttributeManagement from '@/views/ContentView.vue/AttributeManagement.vue'
 
+
+const authStore = useAuthStore()
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -69,6 +73,12 @@ const router = createRouter({
       }
     }
   ]
+})
+
+router.beforeEach((to, from) => {
+  if (!authStore.authenticated && !!getJwtToken()) {
+    authStore.authenticated = true
+  }
 })
 
 export default router
