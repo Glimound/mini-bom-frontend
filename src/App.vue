@@ -6,8 +6,8 @@ import { RouterView } from 'vue-router';
   <RouterView />
 </template>
 
-<style>
+<style lang="scss">
 body {
-  margin: 0px
+  margin: 0px;
 }
 </style>

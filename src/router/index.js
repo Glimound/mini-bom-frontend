@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/auth'
 import DashboardPage from '@/views/DashboardPage.vue'
 import LoginPage from '@/views/LoginPage.vue'
 import RegisterPage from '@/views/RegisterPage.vue'
+import AttributeManagement from '@/views/ContentView/AttributeManagement.vue'
 
 const authStore = useAuthStore()
 
@@ -17,7 +18,17 @@ const router = createRouter({
       component: DashboardPage,
       meta: {
         title: '主页'
-      }
+      },
+      children: [
+        {
+          path: 'attribute',
+          name: 'AttributeManagement',
+          component: AttributeManagement,
+          meta: {
+            title: '属性管理'
+          }
+        }
+      ]
     },
     {
       path: '/login',
