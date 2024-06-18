@@ -21,10 +21,6 @@ const props = defineProps({
     type: Number,
     required: true
   },
-  totalPages: {
-    type: Number,
-    required: true
-  },
   totalRows: {
     type: Number,
     required: true
