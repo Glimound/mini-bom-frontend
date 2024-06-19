@@ -8,7 +8,7 @@ const router = useRouter()
 const authStore = useAuthStore(pinia)
 
 const axiosClient = axios.create({
-  baseURL: 'http://localhost:8080/api/v1',
+  baseURL: 'http://47.120.31.100:14532/api/v1',
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
@@ -53,8 +53,11 @@ export const ApiService = {
   put(resource, data) {
     return axiosClient.put(resource, data)
   },
-  delete(resource) {
+  deleteByPath(resource) {
     return axiosClient.delete(resource)
+  },
+  deleteByParams(resource, params) {
+    return axiosClient.delete(resource, params)
   }
 }
 
@@ -70,5 +73,29 @@ export const UserService = {
   },
   login(params) {
     return ApiService.post('/user/login_verify', params)
+  },
+}
+
+export const partService = {
+  //根据关键词查询Part列表，关键词为“”时查询所有Part
+  getParts(params,pageSize,currPage){
+    return ApiService.query(`/part/find/keyword/${pageSize}/${currPage}`,params)
+  },
+  //根据Part ID查询Part
+  getPartById(params){
+    return ApiService.query(`/part/find/id`,params)
+  },
+  //创建Part
+  createPart(data){
+    return ApiService.post('/part/create',data)
+  },
+  //修改Part
+  modifyPart(data){
+    return ApiService.put('/part/modify',data)
+  },
+
+  //删除Part
+  deletePart(params){
+    return ApiService.deleteByParams(`/part/delete`,params)
   },
 }

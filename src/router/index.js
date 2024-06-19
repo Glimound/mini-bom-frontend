@@ -22,7 +22,32 @@ const router = createRouter({
       component: DashboardPage,
       meta: {
         title: '主页'
-      }
+      },
+      children: [
+        {
+          'path': 'attributeManagement',
+          'name': 'AttributeManagementPage',
+          'component': AttributeManagement,
+        },
+        {
+          'path': 'classificationManagement',
+          'name': 'ClassificationManagementPage',
+          'component': ClassficationManagement,
+          'meta': '分类管理'
+        },
+        {
+          'path': '/partManagement',
+          'name': 'PartManagementPage',
+          'component': PartManagement,
+          'meta': '部件管理'
+        },
+        {
+          'path': 'bomManagement',
+          'name': 'BomManagementPage',
+          'component': BomManagement,
+          'meta': 'BOM管理'
+        },
+      ]
     },
     {
       path: '/login',
@@ -40,38 +65,6 @@ const router = createRouter({
         title: '注册'
       }
     },
-    {
-      path: '/partManagement',
-      name: 'PartManagement',
-      component: PartManagement,
-      meta: {
-        title: '部件管理'
-      }
-    },
-    {
-      path: '/bomManagement',
-      name: 'BomManagement',
-      component: BomManagement,
-      meta: {
-        title: 'BOM管理'
-      }
-    },
-    {
-      path: '/classificationManagement',
-      name: 'ClassificationManagement',
-      component: ClassficationManagement,
-      meta: {
-        title: '分类管理'
-      }
-    },
-    {
-      path: '/attributeManagement',
-      name: 'AttributeManagement',
-      component: AttributeManagement,
-      meta: {
-        title: '属性管理'
-      }
-    }
   ]
 })
 
