@@ -208,13 +208,20 @@ function addAttributeSubmit() {
         delete obj.constraint.precision
         delete obj.constraint.length
       }
-      AttributeService.createAttribute(obj).then(() => {
-        addAttributeFormVisible.value = false
+      AttributeService.createAttribute(obj).then(({data}) => {
+        addAttributeCancel()
         getAttributes(page.value.pageSize, page.value.curPage)
-        ElMessage({
-          message: '新增成功',
-          type: 'success'
-        })
+        if (data.code === 200) {
+          ElMessage({
+            message: '新增成功',
+            type: 'success'
+          })
+        } else {
+          ElMessage({
+            message: data.message,
+            type: 'error'
+          })
+        }
       })
     } else {
       return false;
