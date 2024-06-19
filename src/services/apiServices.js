@@ -82,11 +82,21 @@ export const AttributeService = {
       }
     })
   },
+  getAttributeCount(keyword) {
+    return ApiService.query(`/attr/count`, {
+      params: {
+        keyword: keyword
+      }
+    })
+  },
   getRelevantClassifications(id) {
     return ApiService.query(`/attr/related_type/999/1`, {
       params: {
         id: id
       }
     })
+  },
+  createAttribute(body) {
+    return ApiService.post('/attr/create', body)
   }
 }
