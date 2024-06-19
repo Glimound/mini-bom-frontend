@@ -25,7 +25,7 @@
           <template #default="scope">
           <el-button link type="primary" size="small" @click="handleListClassifications(scope.row)">查看分类</el-button>
           <el-button link type="primary" size="small">修改</el-button>
-          <el-button link type="primary" size="small">删除</el-button>
+          <el-button link type="primary" size="small" @click="handleDeleteAttribute(scope.row)">删除</el-button>
         </template>
         </el-table-column>
       </el-table>
@@ -210,12 +210,12 @@ function addAttributeSubmit() {
       }
       AttributeService.createAttribute(obj).then(({data}) => {
         addAttributeCancel()
-        getAttributes(page.value.pageSize, page.value.curPage)
         if (data.code === 200) {
           ElMessage({
             message: '新增成功',
             type: 'success'
           })
+          getAttributes(page.value.pageSize, page.value.curPage)
         } else {
           ElMessage({
             message: data.message,
@@ -227,6 +227,23 @@ function addAttributeSubmit() {
       return false;
     }
   });
+}
+
+function handleDeleteAttribute(row) {
+  AttributeService.deleteAttribute(row.id).then(({data}) => {
+    if (data.code === 200) {
+      ElMessage({
+        message: '删除成功',
+        type: 'success'
+      })
+      getAttributes(page.value.pageSize, page.value.curPage)
+    } else {
+      ElMessage({
+        message: data.message,
+        type: 'error'
+      })
+    }
+  })
 }
 
 onMounted(() => {

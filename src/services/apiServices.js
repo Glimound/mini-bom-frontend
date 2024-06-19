@@ -98,5 +98,12 @@ export const AttributeService = {
   },
   createAttribute(body) {
     return ApiService.post('/attr/create', body)
+  },
+  deleteAttribute(id) {
+    return ApiService.query('/attr/del', {
+      params: {
+        id: id
+      }
+    })
   }
 }
