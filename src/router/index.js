@@ -47,6 +47,14 @@ const router = createRouter({
           'component': BomManagement,
           'meta': 'BOM管理'
         },
+        {
+          path: 'attribute',
+          name: 'AttributeManagement',
+          component: AttributeManagement,
+          meta: {
+            title: '属性管理'
+          }
+        }
       ]
     },
     {

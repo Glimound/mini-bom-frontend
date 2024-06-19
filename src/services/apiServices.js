@@ -2,6 +2,7 @@ import axios from "axios";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import pinia from "@/stores";
+import { getJwtToken } from "@/services/jwtServices";
 
 const controller = new AbortController()
 const router = useRouter()
@@ -16,7 +17,7 @@ const axiosClient = axios.create({
 })
 
 axiosClient.interceptors.request.use((config) => {
-  if (authStore.isAuthenticated) {
+  if (authStore.authenticated) {
     config.headers.Authorization = `${getJwtToken()}`
   } else if (!config.url.startsWith('/user/')) {
     config.signal = controller.signal
@@ -74,6 +75,23 @@ export const UserService = {
   login(params) {
     return ApiService.post('/user/login_verify', params)
   },
+}
+
+export const AttributeService = {
+  getAttributes(pageSize, currPage, keyword) {
+    return ApiService.query(`/attr/query/${pageSize}/${currPage}`, {
+      params: {
+        keyword: keyword
+      }
+    })
+  },
+  getRelevantClassifications(id) {
+    return ApiService.query(`/attr/related_type/999/1`, {
+      params: {
+        id: id
+      }
+    })
+  }
 }
 
 export const partService = {
