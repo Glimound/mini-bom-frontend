@@ -9,7 +9,7 @@ const router = useRouter()
 const authStore = useAuthStore(pinia)
 
 const axiosClient = axios.create({
-  baseURL: 'http://localhost:8080/api/v1',
+  baseURL: 'http://47.120.31.100:14532/api/v1',
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
@@ -54,9 +54,12 @@ export const ApiService = {
   put(resource, data) {
     return axiosClient.put(resource, data)
   },
-  delete(resource) {
+  /*deleteByPath(resource) {
     return axiosClient.delete(resource)
-  }
+  },
+  deleteByParams(resource, params) {
+    return axiosClient.delete(resource, params)
+  }*/
 }
 
 export const UserService = {
@@ -145,5 +148,76 @@ export const ClassificationService = {
   },
   updateClassification(body) {
     return ApiService.post('/type/update', body)
+  }
+}
+export const ClassificationService = {
+  //根据分类码查询属性
+  getAttrsById(typeId){
+    return ApiService.query('/type/attr',{
+      params:{
+        id:typeId
+      }
+    })
+  }
+}
+
+export const PartService = {
+  //根据关键词查询Part列表，关键词为“”时查询所有Part
+  getParts(keyword,pageSize,currPage){
+    return ApiService.query(`/part/find/keyword/${pageSize}/${currPage}`,{
+      params:{
+        keyword:keyword
+      }
+    })
+  },
+  //根据Part ID查询Part
+  getPartById(id){
+    return ApiService.query('/part/find/id',{
+      params:{
+        id:id
+      }
+    })
+  },
+  //创建Part
+  createPart(data){
+    return ApiService.post('/part/create',data)
+  },
+  //修改Part
+  modifyPart(data){
+    return ApiService.post('/part/modify',data)
+  },
+
+  //删除Part
+  deletePart(id){
+    return ApiService.query('/part/delete',{
+      params:{
+        id:id
+      }
+    })
+  },
+  //查询Part的历史版本列表
+  getHistoryVersionList(masterId){
+    return ApiService.query('/part/history/list',{
+      params:{
+        id:masterId
+      }
+    })
+  },
+  //查询Part的指定历史版本
+  getPartVersionDetail(masterId,versionId){
+    return ApiService.query('/part/history/get',{
+      params:{
+        id:masterId,
+        versionId:versionId
+      }
+    })
+  },
+  deletePartVersion(masterId,versionId){
+    return ApiService.query('/part/history/del',{
+      params:{
+        masterId:masterId,
+        version:versionId
+      }
+    })
   }
 }

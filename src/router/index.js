@@ -5,11 +5,15 @@ import { useAuthStore } from '@/stores/auth'
 import DashboardPage from '@/views/DashboardPage.vue'
 import LoginPage from '@/views/LoginPage.vue'
 import RegisterPage from '@/views/RegisterPage.vue'
+import PartManagement from '@/views/ContentView/PartManagement.vue'
+import BomManagement from '@/views/ContentView/BomManagement.vue'
+import ClassficationManagement from '@/views/ContentView/ClassificationManagement.vue'
 import AttributeManagement from '@/views/ContentView/AttributeManagement.vue'
 import ClassificationManagement from '@/views/ContentView/ClassificationManagement.vue'
 import BomManagement from '@/views/ContentView/BomManagement.vue'
 import PartManagement from '@/views/ContentView/PartManagement.vue'
 import BlankView from '@/views/ContentView/BlankView.vue'
+
 
 const authStore = useAuthStore()
 
@@ -49,21 +53,13 @@ const router = createRouter({
           }
         },
         {
-          path: 'bom-management',
-          name: 'BomManagement',
-          component: BomManagement,
-          meta: {
-            title: 'BOM管理'
-          }
-        },
-        {
           path: 'part-management',
           name: 'PartManagement',
           component: PartManagement,
           meta: {
-            title: 'Part管理'
+            title: 'Part&BOM管理'
           }
-        }
+        },
       ]
     },
     {
@@ -81,7 +77,7 @@ const router = createRouter({
       meta: {
         title: '注册'
       }
-    }
+    },
   ]
 })
 

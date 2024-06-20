@@ -8,24 +8,21 @@
         <span>分类管理</span>
       </el-menu-item>
       <el-menu-item index="/part-management">
-        <span>Part管理</span>
-      </el-menu-item>
-      <el-menu-item index="/bom-management">
-        <span>Bom管理</span>
+        <span>Part&BOM管理</span>
       </el-menu-item>
     </el-menu>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
-
-const route = useRoute()
+import { computed } from "vue";
+import { useRoute } from "vue-router";
+import { House } from "@element-plus/icons-vue";
+const route = useRoute();
 
 const currentRoute = computed(() => {
-  return route.path
-})
+  return route.path;
+});
 </script>
 
 <style lang="scss">
