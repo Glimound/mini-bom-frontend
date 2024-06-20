@@ -4,12 +4,12 @@
     v-model="visible"
     width="700px"
   >
-    <el-tabs v-model="activeTab" @tab-click="handleClick" type="border-card">
+    <el-tabs v-model="activeTab"  type="border-card" @tab-click="handleChangeTab">
       <el-tab-pane label="基本属性" name="basic">
         <el-collapse v-model="activeName">
           <el-collapse-item title="基本属性" name="1">
-            <el-form :model="partData" label-width="120px">
-              <el-form-item label="产品" >
+            <el-form :model="partData" label-width="120px" ref="partFormRef">
+              <el-form-item label="产品">
                 <el-text>笔记本电脑</el-text>
               </el-form-item>
               <el-form-item label="部件名称" prop="name" required>
@@ -172,21 +172,48 @@
           </el-dialog>
         </div>
       </el-tab-pane>
-      <el-tab-pane label="版本管理" name="version" v-if="props.type === 'edit'">
-        <el-form :model="partData" label-width="120px">
-          <el-form-item label="版本" prop="version">
-            <el-input
-              v-model="partData.version"
-              placeholder="请输入版本"
-              size="small"
-            ></el-input>
-          </el-form-item>
-        </el-form>
+      <el-tab-pane label="版本管理" name="version" v-if="props.type === 'edit'" >
+        <el-table class="partVersion" :data="partVersionList" style="width: 100%">
+          <!-- 序号，编码（点击编码可以查看详细信息），版本号，名称，操作（删除）-->
+          <el-table-column type="index" width="50" fixed="left"></el-table-column>
+          <el-table-column
+            prop="id"
+            label="编码"
+            width="150"
+            fixed
+          ></el-table-column>
+          <el-table-column
+            prop="versionId"
+            label="版本号"
+            width="150"
+          ></el-table-column>
+          <el-table-column
+            prop="name"
+            label="名称"
+            width="150"
+          ></el-table-column>
+          <el-table-column label="操作" width="100">
+            <template #default="{ row }">
+              <el-button
+                type="primary"
+                size="small"
+                :icon="View"
+                @click="handleGetVersion(row)"
+              ></el-button>
+              <el-button
+                type="danger"
+                size="small"
+                :icon="Delete"
+                @click="handleDeleteVersion(row)"
+              ></el-button>
+            </template>
+          </el-table-column>
+        </el-table>
       </el-tab-pane>
     </el-tabs>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="visible = false">取 消</el-button>
+        <el-button @click="close">取 消</el-button>
         <el-button type="primary" @click="submitPartForm">提交</el-button>
       </span>
     </template>
@@ -197,16 +224,22 @@
 import { reactive, ref, watch, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
-import { Plus, Position } from "@element-plus/icons-vue";
+import { Plus, Position, View,Delete } from "@element-plus/icons-vue";
 import { PartService, ClassificationService } from "@/services/apiServices";
 
 const props = defineProps({
   type: String, // 用于判断是添加还是编辑
   reload: Function, // 添加或修改完后，刷新列表页
 });
-
+//指向part表单的引用
+const partFormRef = ref(null);
 //默认打开后标签页为基本属性
 const activeTab = ref("basic");
+function handleChangeTab(tab) {
+ if(activeTab.value === "version" && props.type === "edit"){
+    getPartVersionList();
+  }
+}
 //默认显示 基本属性标签页 下的 基本属性面板
 const activeName = ref(["1"]);
 //默认单位的枚举值
@@ -240,86 +273,194 @@ const route = useRoute();
 const visible = ref(false);
 //表单数据
 const partData = ref({
-  id:"",
+  id: "",
+  masterId: "",
   name: "",
-  defaultUnit: "",
+  defaultUnit: "Pcs",
   source: "",
   partType: "",
   classificationId: "",
+  versionId: "",
   attrMap: {},
 });
+//用于存储BOM清单数据
+const bomData = ref([]);
 //用于存储动态生成的表单项模板 扩展属性
 const exAttributes = ref([]);
 // 获取分类码对应的属性，并动态生成表单项
 function fetchAttributes(classificationId) {
-  ClassificationService.getAttrsById(classificationId)
-    .then((res) => {
-      const { parentAttrs, selfAttrs } = res.data.data;
-      // 合并父类属性和自己的属性
-      const allAttrs = [...parentAttrs, ...selfAttrs];
-      // 动态生成表单项
-      exAttributes.value = allAttrs.map((attr) => ({
-        ...attr,
-        value: "", // 初始化表单项的值为空字符串
-      }));
-      // 同步更新partData.attrMap
-      /*
+  // 如果处于编辑模式,则获取当前部件的属性
+  if (props.type === "edit") {
+    ClassificationService.getAttrsById(classificationId)
+      .then((res) => {
+        if (classificationId === "") {
+          return;
+        }
+        const { parentAttrs, selfAttrs } = res.data.data;
+        const allAttrs = [...parentAttrs, ...selfAttrs];
+        exAttributes.value = allAttrs.map((attr) => ({
+          ...attr,
+          value: partData.value.attrMap[attr.nameEn],
+        }));
+      })
+      .catch((error) => {
+        ElMessage.error("编辑错误" + error.message);
+      });
+  } else {
+    ClassificationService.getAttrsById(classificationId)
+      .then((res) => {
+        if (classificationId === "") {
+          return;
+        }
+        const { parentAttrs, selfAttrs } = res.data.data;
+        // 合并父类属性和自己的属性
+        const allAttrs = [...parentAttrs, ...selfAttrs];
+        // 动态生成表单项
+        exAttributes.value = allAttrs.map((attr) => ({
+          ...attr,
+          value: "", // 初始化表单项的值为空字符串
+        }));
+        // 同步更新partData.attrMap
+        /*
     reduce 函数接收一个累加器 acc（初始为空对象 {}）和当前元素 curr。
     对于 allAttrs 中的每个属性对象，reduce 函数设置累加器 acc 的一个新属性，
     其键为当前属性对象的 nameEn 属性值，值为空字符串 ''。
     这样，partData.attrMap 将包含与 allAttrs 中每个属性对应的键值对，
     键是属性的英文名称，值是空字符串，表示该属性的输入框初始值为空。
     */
-      partData.value.attrMap = allAttrs.reduce((acc, curr) => {
-        acc[curr.nameEn] = "";
-        return acc;
-      }, {});
-    })
-    .catch((error) => {
-      ElMessage.error(error.message);
-    });
+        partData.value.attrMap = allAttrs.reduce((acc, curr) => {
+          acc[curr.nameEn] = "";
+          return acc;
+        }, {});
+      })
+      .catch((error) => {
+        ElMessage.error(error.message);
+      });
+  }
 }
 // 监听分类码的变化，重新获取属性并更新表单项
+//{"att1": , "att2":,}
+//["att1": ,"att2": ]
 watch(
   () => partData.value.classificationId,
   (newclassificationId) => {
     fetchAttributes(newclassificationId);
-  },{
-    deep: true
+  },
+  {
+    deep: true,
   }
 );
 
-// 组件挂载后，如果初始有分类码，则获取属性
-onMounted(() => {
-  if (partData.value.classificationId) {
-    fetchAttributes(partData.classificationId);
-  }
-});
-
-// 开启弹窗 todo:确定接口后再完成
+// 开启弹窗
 const open = (id) => {
   visible.value = true;
   if (id) {
-    state.id = id;
     // 如果是有 id 传入，证明是修改模式
     getDetail(id);
   } else {
+    // 如果没有 id 传入，证明是添加模式
+    //重置表单数据
+    partData.value = {
+      id: "",
+      masterId: "",
+      name: "",
+      defaultUnit: "Pcs",
+      source: "",
+      partType: "",
+      classificationId: "",
+      versionId: "",
+      attrMap: {},
+    };
   }
 };
-
 function getDetail(id) {
   PartService.getPartById(id).then((res) => {
-    partData.value = res.data.data;
+    partData.value.id = res.data.data.id;
+    partData.value.masterId = res.data.data.masterId;
+    partData.value.name = res.data.data.name;
+    partData.value.source = res.data.data.source;
+    partData.value.versionId = res.data.data.versionId;
+    partData.value.partType = res.data.data.mode;
+    partData.value.classificationId = res.data.data.typeId;
+    partData.value.attrMap = res.data.data.attrMap;
   });
 }
+
 // 关闭弹窗
 const close = () => {
   visible.value = false;
+  // 重置表单数据
+  partData.value = {
+    id: "",
+    masterId: "",
+    name: "",
+    defaultUnit: "Pcs",
+    source: "",
+    partType: "",
+    classificationId: "",
+    versionId: "",
+    attrMap: {},
+  };
+  exAttributes.value = [];
 };
 
 // 提交表单
 function submitPartForm() {
-  
+  partFormRef.value.validate((valid) => {
+    if (valid) {
+      if (props.type === "add") {
+        PartService.createPart(partData.value)
+          .then((res) => {
+            if (res.data.message === "ok") {
+              ElMessage.success("添加成功");
+              close();
+              props.reload();
+            } else {
+              ElMessage.error("添加失败:" + res.data.message);
+            }
+          })
+          .catch((error) => {
+            ElMessage.error("外部失败:" + error.message);
+          });
+      } else {
+        PartService.modifyPart(partData.value)
+          .then((res) => {
+            if (res.data.message === "ok") {
+              ElMessage.success("修改成功");
+              close();
+              props.reload();
+            } else {
+              ElMessage.error("修改失败:" + res.data.message);
+            }
+          })
+          .catch((error) => {
+            ElMessage.error("外部失败:" + error.message);
+          });
+      }
+    } else {
+      return false;
+    }
+  });
+}
+
+/**
+ * 版本管理相关
+ */
+//历史版本列表
+const partVersionList = ref([]);
+function getPartVersionList() {
+  PartService.getPartVersionList(partData.value.masterId).then((res) => {
+    partVersionList.value = res.data.data;
+  }).catch((error) => {
+    ElMessage.error("获取版本列表失败" + error.message);
+  });
+}
+function handleGetVersion(row) {
+  PartService.getPartVersionDetail(partData.value.masterId,row.id).then((res) => {
+    ElMessage("正在查询历史版本详情");
+  }).catch((error) => {
+    ElMessage.error("获取版本详情失败" + error.message);
+  });
 }
 defineExpose({ open, close });
 </script>

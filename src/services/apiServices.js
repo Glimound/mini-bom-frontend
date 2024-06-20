@@ -127,7 +127,7 @@ export const PartService = {
   },
   //修改Part
   modifyPart(data){
-    return ApiService.put('/part/modify',data)
+    return ApiService.post('/part/modify',data)
   },
 
   //删除Part
@@ -138,4 +138,29 @@ export const PartService = {
       }
     })
   },
+  //查询Part的历史版本列表
+  getHistoryVersionList(masterId){
+    return ApiService.query('/part/history/list',{
+      params:{
+        id:masterId
+      }
+    })
+  },
+  //查询Part的指定历史版本
+  getPartVersionDetail(masterId,versionId){
+    return ApiService.query('/part/history/get',{
+      params:{
+        id:masterId,
+        versionId:versionId
+      }
+    })
+  },
+  deletePartVersion(masterId,versionId){
+    return ApiService.query('/part/history/del',{
+      params:{
+        masterId:masterId,
+        version:versionId
+      }
+    })
+  }
 }

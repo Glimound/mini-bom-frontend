@@ -40,7 +40,6 @@
     <el-table
       class="partTable"
       :data="tableData"
-      border
       style="width: 100%"
       height="350"
     >
@@ -142,14 +141,14 @@ function resetCode() {
 }
 // 分页，当前页，每页显示条数，总条数 todo: 从后端获取
 const currentPage = ref(1);
-const pageSize = ref(5);
+const pageSize = ref(10);
 const total = ref(1);
 //todo: 控制查询方式
 const queryType = ref(2);
 const state = reactive({
   opType: "add",
 });
-//填充的part表单数据
+//指向DialogCreatePart组件的引用
 const addPart = ref(null);
 
 //初始化查询所有部件并获取总数
@@ -161,11 +160,14 @@ onMounted(() => {
 //根据关键词查询
 function handleSearch() {
   if (queryType.value === 1) {
-    PartService
-      .getPartById(searchKeywordCode.value)
+    PartService.getPartById(searchKeywordCode.value)
       .then((res) => {
-        tableData.value = res.data.data;
-        total.value = 1;
+        if (res.data.data === null) {
+          tableData.value = [];
+        } else {
+          tableData.value = [res.data.data];
+          total.value = 1;
+        }
       })
       .catch((error) => {
         ElMessage({
@@ -174,8 +176,11 @@ function handleSearch() {
         });
       });
   } else {
-    PartService
-      .getParts(searchKeywordName.value, pageSize.value, currentPage.value)
+    PartService.getParts(
+      searchKeywordName.value,
+      pageSize.value,
+      currentPage.value
+    )
       .then((res) => {
         tableData.value = res.data.data.data;
         total.value = res.data.data.page.totalRows;
@@ -209,8 +214,7 @@ function handleDelete(row) {
   }).then(() => {
     //deletePart, params:row.partCode
     //todo: 调用后端API删除
-    PartService
-      .deletePart(row.masterId)
+    PartService.deletePart(row.masterId)
       .then((res) => {
         const result = res.data; // 获取返回的数据
         if (result.message === "ok") {
