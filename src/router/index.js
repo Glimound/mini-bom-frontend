@@ -5,10 +5,10 @@ import { useAuthStore } from '@/stores/auth'
 import DashboardPage from '@/views/DashboardPage.vue'
 import LoginPage from '@/views/LoginPage.vue'
 import RegisterPage from '@/views/RegisterPage.vue'
-import PartManagement from '@/views/ContentView.vue/PartManagement.vue'
-import BomManagement from '@/views/ContentView.vue/BomManagement.vue'
-import ClassficationManagement from '@/views/ContentView.vue/ClassificationManagement.vue'
-import AttributeManagement from '@/views/ContentView.vue/AttributeManagement.vue'
+import PartManagement from '@/views/ContentView/PartManagement.vue'
+import BomManagement from '@/views/ContentView/BomManagement.vue'
+import ClassficationManagement from '@/views/ContentView/ClassificationManagement.vue'
+import AttributeManagement from '@/views/ContentView/AttributeManagement.vue'
 
 
 const authStore = useAuthStore()
@@ -25,36 +25,37 @@ const router = createRouter({
       },
       children: [
         {
-          'path': 'attributeManagement',
-          'name': 'AttributeManagementPage',
-          'component': AttributeManagement,
-        },
-        {
-          'path': 'classificationManagement',
-          'name': 'ClassificationManagementPage',
-          'component': ClassficationManagement,
-          'meta': '分类管理'
-        },
-        {
-          'path': '/partManagement',
-          'name': 'PartManagementPage',
-          'component': PartManagement,
-          'meta': '部件管理'
-        },
-        {
-          'path': 'bomManagement',
-          'name': 'BomManagementPage',
-          'component': BomManagement,
-          'meta': 'BOM管理'
-        },
-        {
-          path: 'attribute',
+          path: 'attribute-management',
           name: 'AttributeManagement',
           component: AttributeManagement,
           meta: {
             title: '属性管理'
           }
-        }
+        },
+        {
+          path: 'classification-management',
+          name: 'ClassificationManagementPage',
+          component: ClassficationManagement,
+          meta: {
+            title: '分类管理'
+          }
+        },
+        {
+          path: 'part-management',
+          name: 'PartManagementPage',
+          component: PartManagement,
+          meta: {
+            title: '部件管理'
+          }
+        },
+        {
+          path: 'bom-management',
+          name: 'BomManagementPage',
+          component: BomManagement,
+          meta: {
+            title: 'BOM管理'
+          }
+        },
       ]
     },
     {

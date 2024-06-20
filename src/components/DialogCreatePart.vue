@@ -1,30 +1,23 @@
 <template>
   <el-dialog
     :title="props.type == 'add' ? '添加部件' : '修改部件'"
-    v-model="state.visible"
+    v-model="visible"
     width="700px"
   >
     <el-tabs v-model="activeTab" @tab-click="handleClick" type="border-card">
       <el-tab-pane label="基本属性" name="basic">
         <el-collapse v-model="activeName">
           <el-collapse-item title="基本属性" name="1">
-            <el-form :model="state.partData" label-width="120px">
-              <el-form-item label="产品" prop="product" required>
-                <el-input
-                  v-model="state.partData.product"
-                  placeholder="如笔记本电脑"
-                  size="small"
-                ></el-input>
+            <el-form :model="partData" label-width="120px">
+              <el-form-item label="产品" >
+                <el-text>笔记本电脑</el-text>
               </el-form-item>
-              <el-form-item label="部件名称" prop="partName" required>
-                <el-input
-                  v-model="state.partData.partName"
-                  size="small"
-                ></el-input>
+              <el-form-item label="部件名称" prop="name" required>
+                <el-input v-model="partData.name" size="small"></el-input>
               </el-form-item>
               <el-form-item label="默认单位" prop="defaultUnit" required>
                 <el-select
-                  v-model="state.partData.defaultUnit"
+                  v-model="partData.defaultUnit"
                   placeholder="请选择"
                   size="small"
                 >
@@ -40,116 +33,54 @@
               </el-form-item>
               <el-form-item label="来源" prop="source" required>
                 <el-select
-                  v-model="state.partData.source"
+                  v-model="partData.source"
                   placeholder="请选择来源"
                   size="small"
                 >
-                  <!-- 制造/购买 -->
-                  <el-option label="制造" value="1"></el-option>
-                  <el-option label="购买" value="2"></el-option>
+                  <!-- Make|Buy|Buy_SingleSource -->
+                  <el-option label="Make" value="Make"></el-option>
+                  <el-option label="Buy" value="Buy"></el-option>
+                  <el-option
+                    label="Buy_SingleSource"
+                    value="Buy_SingleSource"
+                  ></el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="装配模式" prop="assemblyMode" required>
+              <el-form-item label="装配模式" prop="partType" required>
                 <el-select
-                  v-model="state.partData.assemblyMode"
+                  v-model="partData.partType"
                   placeholder="请选择装配模式"
                   size="small"
                 >
-                  <!--  装配part/零件part -->
-                  <el-option label="装配part" value="装配part"></el-option>
-                  <el-option label="零件part" value="零件part"></el-option>
+                  <!--  Separable|Inseparable|Part -->
+                  <el-option label="Separable" value="Separable"></el-option>
+                  <el-option
+                    label="Inseparable"
+                    value="Inseparable"
+                  ></el-option>
+                  <el-option label="Part" value="Part"></el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="分类" prop="classification">
+              <el-form-item label="分类" prop="classificationId" required>
                 <el-input
-                  v-model="state.partData.classification"
+                  v-model="partData.classificationId"
                   size="small"
                 ></el-input>
               </el-form-item>
             </el-form>
           </el-collapse-item>
-          <!-- 此栏扩展属性用于创建部件 -->
-          <el-collapse-item
-            title="扩展属性"
-            name="2"
-            v-if="props.type == 'add'"
-          >
-            <el-form :model="state.partData" label-width="120px">
-              <!-- 拓展属性应直接通过分类获取 -->
-              <el-form-item label="分类代码" prop="classificationCode">
-                <el-input
-                  v-model="state.partData.classificationCode"
-                  placeholder="请输入分类代码"
-                  size="small"
-                  disabled
-                ></el-input>
-              </el-form-item>
-              <el-form-item label="品牌" prop="brand">
-                <el-input
-                  v-model="state.partData.brand"
-                  placeholder="请输入品牌"
-                  size="small"
-                  disabled
-                ></el-input>
-              </el-form-item>
-              <el-form-item label="型号" prop="model">
-                <el-input
-                  v-model="state.partData.model"
-                  placeholder="请输入型号"
-                  size="small"
-                  disabled
-                ></el-input>
-              </el-form-item>
-            </el-form>
-          </el-collapse-item>
-          <!-- 此栏扩展属性用于编辑部件 -->
-          <el-collapse-item
-            title="扩展属性"
-            name="3"
-            v-if="props.type !== 'add'"
-          >
-            <el-form :model="state.partData" label-width="120px">
-              <!-- 小类代码，PART类型，适用产品说明，对外名称，对外英文名称 -->
-              <el-form-item label="小类代码" prop="smallClassCode">
-                <el-input
-                  v-model="state.partData.smallClassCode"
-                  placeholder="请输入小类代码"
-                  size="small"
-                ></el-input>
-              </el-form-item>
-              <el-form-item label="PART类型" prop="partType" required>
-                <el-input
-                  v-model="state.partData.partType"
-                  placeholder="请输入PART类型"
-                  size="small"
-                ></el-input>
-              </el-form-item>
+          <el-collapse-item title="扩展属性" name="2">
+            <el-form :model="partData.attrMap" label-width="120px">
+              <!-- 动态生成的表单项 -->
               <el-form-item
-                label="适用产品说明"
-                prop="productDescription"
+                v-for="item in exAttributes"
+                :key="item.id"
+                :label="item.name"
+                :prop="item.nameEn"
                 required
               >
                 <el-input
-                  v-model="state.partData.productDescription"
-                  placeholder="请输入适用产品说明"
-                  size="small"
-                ></el-input>
-              </el-form-item>
-              <el-form-item label="对外名称" prop="externalName" required>
-                <el-input
-                  v-model="state.partData.externalName"
-                  placeholder="请输入对外名称"
-                  size="small"
-                ></el-input>
-              </el-form-item>
-              <el-form-item
-                label="对外英文名称"
-                prop="externalEnglishName"
-                required
-              >
-                <el-input
-                  v-model="state.partData.externalEnglishName"
-                  placeholder="请输入对外英文名称"
+                  v-model="partData.attrMap[item.nameEn]"
                   size="small"
                 ></el-input>
               </el-form-item>
@@ -157,27 +88,35 @@
           </el-collapse-item>
         </el-collapse>
       </el-tab-pane>
-      <el-tab-pane label="BOM清单" name="bom" v-if="props.type === 'add'">
+      <el-tab-pane label="BOM清单" name="bom" v-if="props.type === 'edit'">
         <div class="bom-management">
           <el-button :icon="Plus" @click="handleAddSubItem" size="small"
-            >新增子项</el-button>
+            >新增子项</el-button
+          >
           <el-button :icon="Position" @click="searchBOMLists" size="small"
-            >查看BOM清单</el-button>
+            >查看BOM清单</el-button
+          >
           <el-button :icon="Position" @click="searchParent" size="small"
-          >查看父项</el-button>
-          <el-table :data="bomData" style="width: 100%; margin-top: 20px" title="子项">
-            <el-table-column
-              type="index"
-              width="30"
-            ></el-table-column>
+            >查看父项</el-button
+          >
+          <el-table
+            :data="bomData"
+            style="width: 100%; margin-top: 20px"
+            title="子项"
+          >
+            <el-table-column type="index" width="30"></el-table-column>
             <el-table-column
               prop="code"
               label="编码"
               width="50"
             ></el-table-column>
-            <el-table-column prop="name" label="名称" width="150"></el-table-column>
+            <el-table-column
+              prop="name"
+              label="名称"
+              width="150"
+            ></el-table-column>
             <el-table-column prop="quantity" label="数量"></el-table-column>
-            <el-table-column prop="positionId" label ="位号"></el-table-column>
+            <el-table-column prop="positionId" label="位号"></el-table-column>
             <el-table-column label="操作">
               <template #default="{ row }">
                 <el-button
@@ -234,10 +173,10 @@
         </div>
       </el-tab-pane>
       <el-tab-pane label="版本管理" name="version" v-if="props.type === 'edit'">
-        <el-form :model="state.partData" label-width="120px">
+        <el-form :model="partData" label-width="120px">
           <el-form-item label="版本" prop="version">
             <el-input
-              v-model="state.partData.version"
+              v-model="partData.version"
               placeholder="请输入版本"
               size="small"
             ></el-input>
@@ -247,7 +186,7 @@
     </el-tabs>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="state.visible = false">取 消</el-button>
+        <el-button @click="visible = false">取 消</el-button>
         <el-button type="primary" @click="submitPartForm">提交</el-button>
       </span>
     </template>
@@ -255,10 +194,11 @@
 </template>
 
 <script setup>
-import { reactive, ref } from "vue";
+import { reactive, ref, watch, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
-import {Plus,Position} from "@element-plus/icons-vue";
+import { Plus, Position } from "@element-plus/icons-vue";
+import { PartService, ClassificationService } from "@/services/apiServices";
 
 const props = defineProps({
   type: String, // 用于判断是添加还是编辑
@@ -270,69 +210,95 @@ const activeTab = ref("basic");
 //默认显示 基本属性标签页 下的 基本属性面板
 const activeName = ref(["1"]);
 //默认单位的枚举值
+// Mm3|capacitance|resistance|Workload|Currency|
+//Percent|Mil|ElectricalPotential|M|volume|Weight|Length|area|Kg|Mm2|Pcs|H|D|WW|WmK
 const defaultUnitOptions = [
-  {
-    value: "PCS",
-    label: "PCS",
-  },
-  {
-    value: "SITE",
-    label: "SITE",
-  },
-  {
-    value: "SET",
-    label: "SET",
-  },
-  {
-    value: "M",
-    label: "M",
-  },
-  {
-    value: "EACH",
-    label: "EACH",
-  },
-  {
-    value: "HOP",
-    label: "HOP",
-  },
-  {
-    value: "M*M",
-    label: "M*M",
-  },
-  {
-    value: "TRP",
-    label: "TRP",
-  },
-  {
-    value: "MON",
-    label: "MON",
-  },
-  {
-    value: "KG",
-    label: "KG",
-  },
+  { value: "Mm3", label: "Mm3" },
+  { value: "capacitance", label: "capacitance" },
+  { value: "resistance", label: "resistance" },
+  { value: "Workload", label: "Workload" },
+  { value: "Currency", label: "Currency" },
+  { value: "Percent", label: "Percent" },
+  { value: "Mil", label: "Mil" },
+  { value: "ElectricalPotential", label: "ElectricalPotential" },
+  { value: "M", label: "M" },
+  { value: "volume", label: "volume" },
+  { value: "Weight", label: "Weight" },
+  { value: "Length", label: "Length" },
+  { value: "area", label: "area" },
+  { value: "Kg", label: "Kg" },
+  { value: "Mm2", label: "Mm2" },
+  { value: "Pcs", label: "Pcs" },
+  { value: "H", label: "H" },
+  { value: "D", label: "D" },
+  { value: "WW", label: "WW" },
+  { value: "WmK", label: "WmK" },
 ];
 
-const formRef = ref(null);
 const route = useRoute();
-const state = reactive({
-  visible: false,
-  partData: {
-    product: "",
-    partName: "",
-    defaultUnit: "PCS",
-    source: "",
-    assemblyMode: "",
-    classification: "",
-    classificationCode: "",
-    brand: "",
-    model: "",
-  },
+//弹窗是否显示
+const visible = ref(false);
+//表单数据
+const partData = ref({
+  id:"",
+  name: "",
+  defaultUnit: "",
+  source: "",
+  partType: "",
+  classificationId: "",
+  attrMap: {},
+});
+//用于存储动态生成的表单项模板 扩展属性
+const exAttributes = ref([]);
+// 获取分类码对应的属性，并动态生成表单项
+function fetchAttributes(classificationId) {
+  ClassificationService.getAttrsById(classificationId)
+    .then((res) => {
+      const { parentAttrs, selfAttrs } = res.data.data;
+      // 合并父类属性和自己的属性
+      const allAttrs = [...parentAttrs, ...selfAttrs];
+      // 动态生成表单项
+      exAttributes.value = allAttrs.map((attr) => ({
+        ...attr,
+        value: "", // 初始化表单项的值为空字符串
+      }));
+      // 同步更新partData.attrMap
+      /*
+    reduce 函数接收一个累加器 acc（初始为空对象 {}）和当前元素 curr。
+    对于 allAttrs 中的每个属性对象，reduce 函数设置累加器 acc 的一个新属性，
+    其键为当前属性对象的 nameEn 属性值，值为空字符串 ''。
+    这样，partData.attrMap 将包含与 allAttrs 中每个属性对应的键值对，
+    键是属性的英文名称，值是空字符串，表示该属性的输入框初始值为空。
+    */
+      partData.value.attrMap = allAttrs.reduce((acc, curr) => {
+        acc[curr.nameEn] = "";
+        return acc;
+      }, {});
+    })
+    .catch((error) => {
+      ElMessage.error(error.message);
+    });
+}
+// 监听分类码的变化，重新获取属性并更新表单项
+watch(
+  () => partData.value.classificationId,
+  (newclassificationId) => {
+    fetchAttributes(newclassificationId);
+  },{
+    deep: true
+  }
+);
+
+// 组件挂载后，如果初始有分类码，则获取属性
+onMounted(() => {
+  if (partData.value.classificationId) {
+    fetchAttributes(partData.classificationId);
+  }
 });
 
 // 开启弹窗 todo:确定接口后再完成
 const open = (id) => {
-  state.visible = true;
+  visible.value = true;
   if (id) {
     state.id = id;
     // 如果是有 id 传入，证明是修改模式
@@ -340,62 +306,23 @@ const open = (id) => {
   } else {
   }
 };
-/*
-// todo:确定接口后再完成
-// 获取详情
-const getDetail = (id) => {
-  axios.get(`/categories/${id}`).then((res) => {
-    state.ruleForm = {
-      name: res.categoryName,
-      rank: res.categoryRank,
-    };
-    state.parentId = res.parentId;
-    state.categoryLevel = res.categoryLevel;
+
+function getDetail(id) {
+  PartService.getPartById(id).then((res) => {
+    partData.value = res.data.data;
   });
-};
+}
 // 关闭弹窗
 const close = () => {
-  state.visible = false;
+  visible.value = false;
 };
 
-
-const submitForm = () => {
-  formRef.value.validate((valid) => {
-    if (valid) {
-      if (props.type == "add") {
-        // 添加方法
-        axios
-          .post("/categories", {
-            categoryLevel: state.categoryLevel,
-            parentId: state.parentId,
-            categoryName: state.ruleForm.name,
-            categoryRank: state.ruleForm.rank,
-          })
-          .then(() => {
-            ElMessage.success("添加成功");
-            state.visible = false;
-            // 接口回调之后，运行重新获取列表方法 reload
-            if (props.reload) props.reload();
-          });
-      } else {
-        // 修改方法
-        axios
-          .put("/categories", {
-            categoryId: state.id,
-            categoryLevel: state.categoryLevel,
-            parentId: state.categoryLevel,
-            categoryName: state.ruleForm.name,
-            categoryRank: state.ruleForm.rank,
-          })
-          .then(() => {
-            ElMessage.success("修改成功");
-            state.visible = false;
-            // 接口回调之后，运行重新获取列表方法 reload
-            if (props.reload) props.reload();
-          });
-      }
-    }
-  });
-};*/
+// 提交表单
+function submitPartForm() {
+  
+}
 defineExpose({ open, close });
 </script>
+
+<style lang="scss">
+</style>

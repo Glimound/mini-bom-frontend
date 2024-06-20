@@ -6,13 +6,13 @@
           <el-icon size ="small"><House /></el-icon>
           <span>控制台</span>
         </template>
-        <el-menu-item index="/attributeManagement">
+        <el-menu-item index="/attribute-management">
           <span>属性管理</span>
         </el-menu-item>
-        <el-menu-item index="/classificationManagement">
+        <el-menu-item index="/classification-management">
           <span>分类管理</span>
         </el-menu-item>
-        <el-menu-item index="/partManagement">
+        <el-menu-item index="/part-management">
           <span>部件&BOM管理</span>
         </el-menu-item>
       </el-sub-menu>

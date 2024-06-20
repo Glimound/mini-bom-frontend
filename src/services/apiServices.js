@@ -54,12 +54,12 @@ export const ApiService = {
   put(resource, data) {
     return axiosClient.put(resource, data)
   },
-  deleteByPath(resource) {
+  /*deleteByPath(resource) {
     return axiosClient.delete(resource)
   },
   deleteByParams(resource, params) {
     return axiosClient.delete(resource, params)
-  }
+  }*/
 }
 
 export const UserService = {
@@ -93,15 +93,33 @@ export const AttributeService = {
     })
   }
 }
+export const ClassificationService = {
+  //根据分类码查询属性
+  getAttrsById(typeId){
+    return ApiService.query('/type/attr',{
+      params:{
+        id:typeId
+      }
+    })
+  }
+}
 
-export const partService = {
+export const PartService = {
   //根据关键词查询Part列表，关键词为“”时查询所有Part
-  getParts(params,pageSize,currPage){
-    return ApiService.query(`/part/find/keyword/${pageSize}/${currPage}`,params)
+  getParts(keyword,pageSize,currPage){
+    return ApiService.query(`/part/find/keyword/${pageSize}/${currPage}`,{
+      params:{
+        keyword:keyword
+      }
+    })
   },
   //根据Part ID查询Part
-  getPartById(params){
-    return ApiService.query(`/part/find/id`,params)
+  getPartById(id){
+    return ApiService.query('/part/find/id',{
+      params:{
+        id:id
+      }
+    })
   },
   //创建Part
   createPart(data){
@@ -113,7 +131,11 @@ export const partService = {
   },
 
   //删除Part
-  deletePart(params){
-    return ApiService.deleteByParams(`/part/delete`,params)
+  deletePart(id){
+    return ApiService.query('/part/delete',{
+      params:{
+        id:id
+      }
+    })
   },
 }

@@ -2,7 +2,7 @@
   <div class="part-management">
     <el-container>
       <el-radio-group class="query-radios" v-model="queryType">
-        <el-radio :label="1">按部件编码查询</el-radio>
+        <el-radio :label="1" @click="resetName">按部件编码查询</el-radio>
         <el-input
           placeholder="请输入部件编码"
           v-model="searchKeywordCode"
@@ -11,7 +11,7 @@
           style="width: 20%"
           clearable
         ></el-input>
-        <el-radio :label="2">按部件名称查询</el-radio>
+        <el-radio :label="2" @click="resetCode">按部件名称查询</el-radio>
         <el-input
           placeholder="请输入部件名称"
           v-model="searchKeywordName"
@@ -44,7 +44,7 @@
       style="width: 100%"
       height="350"
     >
-      <el-table-column type="index" width="55" fixed="left"/>
+      <el-table-column type="index" width="55" fixed="left" />
       <el-table-column
         prop="id"
         label="部件编码"
@@ -102,7 +102,11 @@
       :total="total"
     >
     </el-pagination>
-    <DialogCreatePart ref="addPart" :reload="handleSearch" :type="state.opType" />
+    <DialogCreatePart
+      ref="addPart"
+      :reload="handleSearch"
+      :type="state.opType"
+    />
   </div>
 </template>
 
@@ -114,26 +118,34 @@ import { Edit, Delete, Search, Plus } from "@element-plus/icons-vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import DialogCreatePart from "@/components/DialogCreatePart.vue";
 import router from "@/router";
-import { partService } from "@/services/apiServices";
-import {onMounted} from "vue";
+import { PartService } from "@/services/apiServices";
+import { onMounted } from "vue";
 // 定义表格数据
 /**
  * id:
+ * masterId:
  * name:
- * version:
+ * versionId:
  * mode:
  * typeId:
+ * source:
  */
 const tableData = ref([]);
 //查询关键词
 const searchKeywordCode = ref("");
 const searchKeywordName = ref("");
+function resetName() {
+  searchKeywordName.value = "";
+}
+function resetCode() {
+  searchKeywordCode.value = "";
+}
 // 分页，当前页，每页显示条数，总条数 todo: 从后端获取
 const currentPage = ref(1);
 const pageSize = ref(5);
 const total = ref(1);
 //todo: 控制查询方式
-const queryType = ref(1);
+const queryType = ref(2);
 const state = reactive({
   opType: "add",
 });
@@ -148,16 +160,33 @@ onMounted(() => {
 
 //根据关键词查询
 function handleSearch() {
-  const keyword = (queryType === 1 ? searchKeywordCode.value : searchKeywordName.value);
-  partService.getParts(keyword,pageSize.value,currentPage.value).then((res) => {
-    tableData.value = res.data.data.data;
-    total.value = res.data.data.page.totalRows;
-  }).catch((error) => {
-    ElMessage({
-      type: "error",
-      message: error.message || "查询失败!",
-    })
-  });
+  if (queryType.value === 1) {
+    PartService
+      .getPartById(searchKeywordCode.value)
+      .then((res) => {
+        tableData.value = res.data.data;
+        total.value = 1;
+      })
+      .catch((error) => {
+        ElMessage({
+          type: "error",
+          message: error.message || "查询失败!",
+        });
+      });
+  } else {
+    PartService
+      .getParts(searchKeywordName.value, pageSize.value, currentPage.value)
+      .then((res) => {
+        tableData.value = res.data.data.data;
+        total.value = res.data.data.page.totalRows;
+      })
+      .catch((error) => {
+        ElMessage({
+          type: "error",
+          message: error.message || "查询失败!",
+        });
+      });
+  }
 }
 
 //创建
@@ -180,8 +209,8 @@ function handleDelete(row) {
   }).then(() => {
     //deletePart, params:row.partCode
     //todo: 调用后端API删除
-    axios
-      .delete(`/part/delete,`,row.id)
+    PartService
+      .deletePart(row.masterId)
       .then((res) => {
         const result = res.data; // 获取返回的数据
         if (result.message === "ok") {
@@ -190,8 +219,8 @@ function handleDelete(row) {
             type: "success",
             message: result.message || "删除成功!", // 使用后端返回的消息或默认消息
           });
-        } 
-        else {
+          handleSearch();
+        } else {
           // 删除失败
           ElMessage({
             type: "error",
@@ -203,7 +232,7 @@ function handleDelete(row) {
         // 请求失败（网络问题或服务器错误等）
         ElMessage({
           type: "error",
-          message: "请求失败，请稍后再试!",
+          message: error.message || "删除失败!", // 使用后端返回的消息或默认消息
         });
       })
       .catch(() => {
@@ -214,7 +243,6 @@ function handleDelete(row) {
       });
   });
 }
-
 
 // 分页
 function handleSizeChange(newSize) {
