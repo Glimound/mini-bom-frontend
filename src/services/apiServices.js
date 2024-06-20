@@ -110,3 +110,40 @@ export const AttributeService = {
     return ApiService.post('/attr/modify', body)
   }
 }
+
+export const ClassificationService = {
+  getClassifications(pageSize, currPage, keyword) {
+    return ApiService.query(`/type/query/${pageSize}/${currPage}`, {
+      params: {
+        keyword: keyword
+      }
+    })
+  },
+  getClassificationCount(keyword) {
+    return ApiService.query('/type/count', {
+      params: {
+        keyword: keyword
+      }
+    })
+  },
+  getRelevantAttributes(id) {
+    return ApiService.query('/type/attr', {
+      params: {
+        id: id
+      }
+    })
+  },
+  createClassification(body) {
+    return ApiService.post('/type/create', body)
+  },
+  deleteClassification(id) {
+    return ApiService.query('/type/delete', {
+      params: {
+        id: id
+      }
+    })
+  },
+  updateClassification(body) {
+    return ApiService.post('/type/update', body)
+  }
+}
