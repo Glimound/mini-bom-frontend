@@ -105,5 +105,8 @@ export const AttributeService = {
         id: id
       }
     })
+  },
+  updateAttribute(body) {
+    return ApiService.post('/attr/modify', body)
   }
 }

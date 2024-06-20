@@ -24,7 +24,7 @@
         <el-table-column fixed="right" label="操作" width="180">
           <template #default="scope">
           <el-button link type="primary" size="small" @click="handleListClassifications(scope.row)">查看分类</el-button>
-          <el-button link type="primary" size="small">修改</el-button>
+          <el-button link type="primary" size="small" @click="handleEditAttribute(scope.row)">修改</el-button>
           <el-button link type="primary" size="small" @click="handleDeleteAttribute(scope.row)">删除</el-button>
         </template>
         </el-table-column>
@@ -55,43 +55,85 @@
   </div>
 
   <el-dialog v-model="addAttributeFormVisible" title="新增属性" style="padding: 20px;">
-    <el-form :model="addAttributeForm" :rules="rules" ref="addAttributeFormRef" label-width="80px" style="padding: 5px 10px 0px 10px;">
+    <el-form :model="attributeForm" :rules="rules" ref="attributeFormRef" label-width="80px" style="padding: 5px 10px 0px 10px;">
       <el-form-item label="中文名称" prop="name">
-        <el-input v-model="addAttributeForm.name"/>
+        <el-input v-model="attributeForm.name"/>
       </el-form-item>
       <el-form-item label="中文描述" prop="description">
-        <el-input v-model="addAttributeForm.description" type="textarea"/>
+        <el-input v-model="attributeForm.description" type="textarea"/>
       </el-form-item>
       <el-form-item label="英文名称" prop="nameEn">
-        <el-input v-model="addAttributeForm.nameEn"/>
+        <el-input v-model="attributeForm.nameEn"/>
       </el-form-item>
       <el-form-item label="英文描述" prop="descriptionEn">
-        <el-input v-model="addAttributeForm.descriptionEn" type="textarea"/>
+        <el-input v-model="attributeForm.descriptionEn" type="textarea"/>
       </el-form-item>
       <el-form-item label="类型" prop="type">
-        <el-select v-model="addAttributeForm.type" placeholder="选择属性类型">
+        <el-select v-model="attributeForm.type" placeholder="选择属性类型">
           <el-option label="TEXT" value="TEXT" />
           <el-option label="INTEGER" value="INTEGER" />
           <el-option label="DECIMAL" value="DECIMAL" />
         </el-select>
       </el-form-item>
-      <el-form-item v-if="addAttributeForm.type == 'DECIMAL'" label="精度" prop="precision">
-        <el-input v-model="addAttributeForm.precision" placeholder="1~30" type="number" min="1" max="30"/>
+      <el-form-item v-if="attributeForm.type == 'DECIMAL'" label="精度" prop="precision">
+        <el-input v-model="attributeForm.precision" placeholder="1~30" type="number" min="1" max="30"/>
       </el-form-item>
-      <el-form-item v-if="addAttributeForm.type == 'TEXT'" label="长度" prop="length">
-        <el-input v-model="addAttributeForm.length" placeholder="1~30" type="number" min="1" max="30"/>
+      <el-form-item v-if="attributeForm.type == 'TEXT'" label="长度" prop="length">
+        <el-input v-model="attributeForm.length" placeholder="1~30" type="number" min="1" max="30"/>
       </el-form-item>
-      <el-form-item label="属性状态" prop="disabledFlag">
-        <el-radio-group v-model="addAttributeForm.disabledFlag">
-          <el-radio :label="true">有效</el-radio>
-          <el-radio :label="false">无效</el-radio>
+      <el-form-item label="属性状态" prop="disableFlag">
+        <el-radio-group v-model="attributeForm.disableFlag">
+          <el-radio :value="true">有效</el-radio>
+          <el-radio :value="false">无效</el-radio>
         </el-radio-group>
       </el-form-item>
     </el-form>
     <template #footer>
       <div class="dialog-footer" style="padding: 5px 10px;">
-        <el-button @click="addAttributeCancel">取消</el-button>
+        <el-button @click="attributeFormCancel">取消</el-button>
         <el-button type="primary" @click="addAttributeSubmit">确认</el-button>
+      </div>
+    </template>
+  </el-dialog>
+
+  <el-dialog v-model="editAttributeFormVisible" title="修改属性" style="padding: 20px;">
+    <el-form :model="attributeForm" :rules="rules" ref="attributeFormRef" label-width="80px" style="padding: 5px 10px 0px 10px;">
+      <el-form-item label="中文名称" prop="name">
+        <el-input v-model="attributeForm.name"/>
+      </el-form-item>
+      <el-form-item label="中文描述" prop="description">
+        <el-input v-model="attributeForm.description" type="textarea"/>
+      </el-form-item>
+      <el-form-item label="英文名称" prop="nameEn">
+        <el-input v-model="attributeForm.nameEn"/>
+      </el-form-item>
+      <el-form-item label="英文描述" prop="descriptionEn">
+        <el-input v-model="attributeForm.descriptionEn" type="textarea"/>
+      </el-form-item>
+      <el-form-item label="类型" prop="type">
+        <el-select v-model="attributeForm.type" placeholder="选择属性类型" disabled>
+          <el-option label="TEXT" value="TEXT" />
+          <el-option label="INTEGER" value="INTEGER" />
+          <el-option label="DECIMAL" value="DECIMAL" />
+        </el-select>
+      </el-form-item>
+      <el-form-item v-if="attributeForm.type == 'DECIMAL'" label="精度" prop="precision">
+        <el-input v-model="attributeForm.precision" placeholder="1~30" type="number" min="1" max="30" disabled/>
+      </el-form-item>
+      <el-form-item v-if="attributeForm.type == 'TEXT'" label="长度" prop="length">
+        <el-input v-model="attributeForm.length" placeholder="1~30" type="number" min="1" max="30" disabled/>
+      </el-form-item>
+      <el-form-item label="属性状态" prop="disableFlag">
+        <el-radio-group v-model="attributeForm.disableFlag">
+          <el-radio :value="false">有效</el-radio>
+          <el-radio :value="true">无效</el-radio>
+        </el-radio-group>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <div class="dialog-footer" style="padding: 5px 10px;">
+        <el-button @click="attributeFormCancel">取消</el-button>
+        <el-button type="primary" @click="editAttributeSubmit">确认</el-button>
       </div>
     </template>
   </el-dialog>
@@ -111,17 +153,18 @@ const page = ref({})
 const relevantClassifications = ref([])
 const selectedAttributeName = ref('')
 const addAttributeFormVisible = ref(false)
-const addAttributeForm = ref({
+const editAttributeFormVisible = ref(false)
+const attributeForm = ref({
   name: '',
   nameEn: '',
   description: '',
   descriptionEn: '',
   type: '',
-  disabledFlag: false,
+  disableFlag: false,
   precision: 1,
   length: 1
 })
-const addAttributeFormRef = ref(null)
+const attributeFormRef = ref(null)
 const rules = {
   name: [{ required: true, message: '中文名称不能为空', trigger: 'blur' }],
   description: [{ required: true, message: '中文描述不能为空', trigger: 'blur' }],
@@ -130,7 +173,7 @@ const rules = {
   type: [{ required: true, message: '类型不能为空', trigger: 'change' }],
   precision: [{ required: true, message: '精度不能为空', trigger: 'blur' }],
   length: [{ required: true, message: '长度不能为空', trigger: 'blur' }],
-  disabledFlag: [{ required: true, message: '属性状态不能为空', trigger: 'change' }]
+  disableFlag: [{ required: true, message: '属性状态不能为空', trigger: 'change' }]
 };
 
 const labelText = computed(() => {
@@ -151,6 +194,20 @@ function getAttributes(pageSize, currPage) {
   AttributeService.getAttributes(pageSize, currPage, filterData.value.attribute)
   .then(({data}) => {
     attributeData.value = data.data.data
+    // format constraint
+    attributeData.value.forEach(obj => {
+      let str = obj.constraint.replace(/\\/g, '');
+      let tmpConstraint = JSON.parse(obj.constraint)
+      let newConstraint = {
+        type: obj.type
+      }
+      if (obj.type === 'TEXT') {
+        newConstraint.length = tmpConstraint.length
+      } else if (obj.type === 'DECIMAL') {
+        newConstraint.precision = tmpConstraint.precision
+      }
+      obj.constraint = newConstraint
+    });
     page.value.curPage = data.data.page.curPage
     page.value.pageSize = data.data.page.pageSize
   })
@@ -170,34 +227,35 @@ function addAttribute() {
   addAttributeFormVisible.value = true
 }
 
-function addAttributeCancel() {
+function attributeFormCancel() {
   addAttributeFormVisible.value = false
-  addAttributeForm.value = {
+  editAttributeFormVisible.value = false
+  attributeForm.value = {
     name: '',
     nameEn: '',
     description: '',
     descriptionEn: '',
     type: '',
-    disabledFlag: false,
+    disableFlag: false,
     precision: 1,
     length: 1
   }
 }
 
 function addAttributeSubmit() {
-  addAttributeFormRef.value.validate((valid) => {
+  attributeFormRef.value.validate((valid) => {
     if (valid) {
       let obj = {
-        name: addAttributeForm.value.name,
-        nameEn: addAttributeForm.value.nameEn,
-        description: addAttributeForm.value.description,
-        descriptionEn: addAttributeForm.value.descriptionEn,
-        type: addAttributeForm.value.type,
-        disabledFlag: addAttributeForm.value.disabledFlag,
+        name: attributeForm.value.name,
+        nameEn: attributeForm.value.nameEn,
+        description: attributeForm.value.description,
+        descriptionEn: attributeForm.value.descriptionEn,
+        type: attributeForm.value.type,
+        disableFlag: attributeForm.value.disableFlag,
         constraint: {
-          type: addAttributeForm.value.type,
-          precision: +addAttributeForm.value.precision,
-          length: +addAttributeForm.value.length
+          type: attributeForm.value.type,
+          precision: +attributeForm.value.precision,
+          length: +attributeForm.value.length
         }
       }
       if (obj.type === 'TEXT') {
@@ -209,7 +267,7 @@ function addAttributeSubmit() {
         delete obj.constraint.length
       }
       AttributeService.createAttribute(obj).then(({data}) => {
-        addAttributeCancel()
+        attributeFormCancel()
         if (data.code === 200) {
           ElMessage({
             message: '新增成功',
@@ -244,6 +302,68 @@ function handleDeleteAttribute(row) {
       })
     }
   })
+}
+
+function handleEditAttribute(row) {
+  editAttributeFormVisible.value = true
+  attributeForm.value = {
+    id: row.id,
+    name: row.name,
+    nameEn: row.nameEn,
+    description: row.description,
+    descriptionEn: row.descriptionEn,
+    type: row.type,
+    disableFlag: row.disableFlag,
+    precision: row.constraint.precision,
+    length: row.constraint.length
+  }
+}
+
+function editAttributeSubmit() {
+  attributeFormRef.value.validate((valid) => {
+    if (valid) {
+      let obj = {
+        id: attributeForm.value.id,
+        name: attributeForm.value.name,
+        nameEn: attributeForm.value.nameEn,
+        description: attributeForm.value.description,
+        descriptionEn: attributeForm.value.descriptionEn,
+        type: attributeForm.value.type,
+        disableFlag: attributeForm.value.disableFlag,
+        constraint: {
+          type: attributeForm.value.type,
+          precision: +attributeForm.value.precision,
+          length: +attributeForm.value.length
+        }
+      }
+      if (obj.type === 'TEXT') {
+        delete obj.constraint.precision
+      } else if (obj.type === 'DECIMAL') {
+        delete obj.constraint.length
+      } else {
+        delete obj.constraint.precision
+        delete obj.constraint.length
+      }
+      AttributeService.updateAttribute(obj).then(({data}) => {
+        attributeFormCancel()
+        if (data.code === 200) {
+          ElMessage({
+            message: '修改成功',
+            type: 'success'
+          })
+          getAttributes(page.value.pageSize, page.value.curPage)
+        } else {
+          ElMessage({
+            message: data.message,
+            type: 'error'
+          })
+        }
+      })
+    } else {
+      return false;
+    }
+  });
+
 }
 
 onMounted(() => {
