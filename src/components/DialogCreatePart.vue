@@ -291,7 +291,7 @@ const exAttributes = ref([]);
 function fetchAttributes(classificationId) {
   // 如果处于编辑模式,则获取当前部件的属性
   if (props.type === "edit") {
-    ClassificationService.getAttrsById(classificationId)
+    ClassificationService.getRelevantAttributes(classificationId)
       .then((res) => {
         if (classificationId === "") {
           return;
@@ -307,7 +307,7 @@ function fetchAttributes(classificationId) {
         ElMessage.error("编辑错误" + error.message);
       });
   } else {
-    ClassificationService.getAttrsById(classificationId)
+    ClassificationService.getRelevantAttributes(classificationId)
       .then((res) => {
         if (classificationId === "") {
           return;

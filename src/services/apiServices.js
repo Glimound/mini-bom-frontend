@@ -150,16 +150,6 @@ export const ClassificationService = {
     return ApiService.post('/type/update', body)
   }
 }
-export const ClassificationService = {
-  //根据分类码查询属性
-  getAttrsById(typeId){
-    return ApiService.query('/type/attr',{
-      params:{
-        id:typeId
-      }
-    })
-  }
-}
 
 export const PartService = {
   //根据关键词查询Part列表，关键词为“”时查询所有Part
