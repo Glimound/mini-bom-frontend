@@ -4,7 +4,7 @@
     <div class="main-container">
       <TheNavMenu/>
       <div class="content-area">
-        <TheBreadcrumb/>
+        <!-- <TheBreadcrumb/> -->
         <router-view/>
       </div>
     </div>
@@ -28,10 +28,12 @@ import TheToolbar from '@/components/TheToolbar.vue';
       width: 100%;
 
       .content-area {
-        width: calc(100% - 200px);
-        padding-left: 200px;
-        overflow-y: auto;
-        height: auto;
+        padding: 20px 20px 20px 220px;
+        // overflow-y: auto;
+        // height: auto;
+        height: calc(100% - 40px);
+        // min-height: calc(100% - 40px);
+        background-color: #f2f4f7;
       }
     }
   }
