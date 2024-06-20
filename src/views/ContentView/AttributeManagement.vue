@@ -18,8 +18,8 @@
       <el-table :data="attributeData">
         <el-table-column prop="name" label="属性中文名称"/>
         <el-table-column prop="nameEn" label="属性英文名称"/>
-        <el-table-column prop="description" label="中文描述"/>
-        <el-table-column prop="descriptionEn" label="英文描述"/>
+        <el-table-column prop="description" label="属性中文描述"/>
+        <el-table-column prop="descriptionEn" label="属性英文描述"/>
         <el-table-column prop="type" label="数据类型"/>
         <el-table-column fixed="right" label="操作" width="180">
           <template #default="scope">
