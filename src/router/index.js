@@ -9,6 +9,10 @@ import PartManagement from '@/views/ContentView/PartManagement.vue'
 import BomManagement from '@/views/ContentView/BomManagement.vue'
 import ClassficationManagement from '@/views/ContentView/ClassificationManagement.vue'
 import AttributeManagement from '@/views/ContentView/AttributeManagement.vue'
+import ClassificationManagement from '@/views/ContentView/ClassificationManagement.vue'
+import BomManagement from '@/views/ContentView/BomManagement.vue'
+import PartManagement from '@/views/ContentView/PartManagement.vue'
+import BlankView from '@/views/ContentView/BlankView.vue'
 
 
 const authStore = useAuthStore()
@@ -25,6 +29,14 @@ const router = createRouter({
       },
       children: [
         {
+          path: '',
+          name: 'BlankView',
+          component: BlankView,
+          meta: {
+            title: '空白页'
+          }
+        },
+        {
           path: 'attribute-management',
           name: 'AttributeManagement',
           component: AttributeManagement,
@@ -34,26 +46,18 @@ const router = createRouter({
         },
         {
           path: 'classification-management',
-          name: 'ClassificationManagementPage',
-          component: ClassficationManagement,
+          name: 'ClassificationManagement',
+          component: ClassificationManagement,
           meta: {
             title: '分类管理'
           }
         },
         {
           path: 'part-management',
-          name: 'PartManagementPage',
+          name: 'PartManagement',
           component: PartManagement,
           meta: {
-            title: '部件管理'
-          }
-        },
-        {
-          path: 'bom-management',
-          name: 'BomManagementPage',
-          component: BomManagement,
-          meta: {
-            title: 'BOM管理'
+            title: 'Part&BOM管理'
           }
         },
       ]

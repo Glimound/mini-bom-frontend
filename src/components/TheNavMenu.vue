@@ -1,21 +1,15 @@
 <template>
   <div class="navigation">
     <el-menu :default-active="currentRoute" :router="true">
-      <el-sub-menu index="/">
-        <template #title>
-          <el-icon size ="small"><House /></el-icon>
-          <span>控制台</span>
-        </template>
-        <el-menu-item index="/attribute-management">
-          <span>属性管理</span>
-        </el-menu-item>
-        <el-menu-item index="/classification-management">
-          <span>分类管理</span>
-        </el-menu-item>
-        <el-menu-item index="/part-management">
-          <span>部件&BOM管理</span>
-        </el-menu-item>
-      </el-sub-menu>
+      <el-menu-item index="/attribute-management">
+        <span>属性管理</span>
+      </el-menu-item>
+      <el-menu-item index="/classification-management">
+        <span>分类管理</span>
+      </el-menu-item>
+      <el-menu-item index="/part-management">
+        <span>Part&BOM管理</span>
+      </el-menu-item>
     </el-menu>
   </div>
 </template>

@@ -85,12 +85,69 @@ export const AttributeService = {
       }
     })
   },
+  getAttributeCount(keyword) {
+    return ApiService.query(`/attr/count`, {
+      params: {
+        keyword: keyword
+      }
+    })
+  },
   getRelevantClassifications(id) {
     return ApiService.query(`/attr/related_type/999/1`, {
       params: {
         id: id
       }
     })
+  },
+  createAttribute(body) {
+    return ApiService.post('/attr/create', body)
+  },
+  deleteAttribute(id) {
+    return ApiService.query('/attr/del', {
+      params: {
+        id: id
+      }
+    })
+  },
+  updateAttribute(body) {
+    return ApiService.post('/attr/modify', body)
+  }
+}
+
+export const ClassificationService = {
+  getClassifications(pageSize, currPage, keyword) {
+    return ApiService.query(`/type/query/${pageSize}/${currPage}`, {
+      params: {
+        keyword: keyword
+      }
+    })
+  },
+  getClassificationCount(keyword) {
+    return ApiService.query('/type/count', {
+      params: {
+        keyword: keyword
+      }
+    })
+  },
+  getRelevantAttributes(id) {
+    return ApiService.query('/type/attr', {
+      params: {
+        id: id
+      }
+    })
+  },
+  createClassification(body) {
+    return ApiService.post('/type/create', body)
+  },
+  deleteClassification(id) {
+    return ApiService.query('/type/delete', {
+      params: {
+        id: id
+      }
+    })
+  },
+  updateClassification(body) {
+    return ApiService.post('/type/update', body)
   }
 }
 export const ClassificationService = {
