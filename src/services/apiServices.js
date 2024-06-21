@@ -155,11 +155,12 @@ export const PartService = {
       }
     })
   },
-  deletePartVersion(masterId,versionId){
+  //删除Part的最新版本
+  deletePartVersion(masterId,version){
     return ApiService.query('/part/history/del',{
       params:{
         masterId:masterId,
-        version:versionId
+        version:version
       }
     })
   }

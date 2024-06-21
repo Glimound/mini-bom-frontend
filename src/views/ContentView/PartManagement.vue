@@ -30,6 +30,7 @@
         查询
       </el-button>
     </el-container>
+    <el-divider class="divider" />
     <el-button
       class="createButton"
       type="primary"

@@ -4,7 +4,11 @@
     v-model="visible"
     width="700px"
   >
-    <el-tabs v-model="activeTab"  type="border-card" @tab-click="handleChangeTab">
+    <el-tabs
+      v-model="activeTab"
+      type="border-card"
+      @tab-change="handleChangeTab"
+    >
       <el-tab-pane label="基本属性" name="basic">
         <el-collapse v-model="activeName">
           <el-collapse-item title="基本属性" name="1">
@@ -123,8 +127,7 @@
                   type="primary"
                   size="small"
                   :icon="EditPen"
-                  @click="handleEditItem(row)"
-                  v-if="!row.isParent"
+                  @click="handleEditSubitem(row)"
                 >
                   修改
                 </el-button>
@@ -132,8 +135,7 @@
                   type="danger"
                   size="small"
                   :icon="Delete"
-                  @click="handleDeleteItem(row)"
-                  v-if="!row.isParent"
+                  @click="handleDeleteSubitem(row)"
                 >
                   删除
                 </el-button>
@@ -142,8 +144,8 @@
           </el-table>
           <!-- 模态框用于新增或修改BOM子项 -->
           <el-dialog
-            title="BOM子项"
-            v-model="dialogVisible"
+            title="添加子项"
+            v-model="addSubitemVisible"
             width="30%"
             :before-close="handleCloseDialog"
           >
@@ -172,27 +174,35 @@
           </el-dialog>
         </div>
       </el-tab-pane>
-      <el-tab-pane label="版本管理" name="version" v-if="props.type === 'edit'" >
-        <el-table class="partVersion" :data="partVersionList" style="width: 100%">
+      <el-tab-pane label="版本管理" name="version" v-if="props.type === 'edit'">
+        <el-table
+          class="partVersion"
+          :data="partVersionList"
+          style="width: 100%"
+        >
           <!-- 序号，编码（点击编码可以查看详细信息），版本号，名称，操作（删除）-->
-          <el-table-column type="index" width="50" fixed="left"></el-table-column>
+          <el-table-column
+            type="index"
+            width="30"
+            fixed="left"
+          ></el-table-column>
           <el-table-column
             prop="id"
             label="编码"
-            width="150"
+            width="250"
             fixed
           ></el-table-column>
           <el-table-column
             prop="versionId"
             label="版本号"
-            width="150"
+            width="90"
           ></el-table-column>
           <el-table-column
             prop="name"
             label="名称"
-            width="150"
+            width="120"
           ></el-table-column>
-          <el-table-column label="操作" width="100">
+          <el-table-column label="操作" width="150">
             <template #default="{ row }">
               <el-button
                 type="primary"
@@ -205,10 +215,34 @@
                 size="small"
                 :icon="Delete"
                 @click="handleDeleteVersion(row)"
+                v-if="row.versionId === partData.value.versionId"
               ></el-button>
             </template>
           </el-table-column>
         </el-table>
+        <el-dialog
+          title="版本详情"
+          v-model="PartVersionDetailVisible"
+          width="30%"
+        >
+          <el-form :model="partVersionDetail" label-width="70px">
+            <el-form-item label="id">
+              <el-text>{{ partVersionDetail.id }}</el-text>
+            </el-form-item>
+            <el-form-item label="名称">
+              <el-text>{{ partVersionDetail.name }}</el-text>
+            </el-form-item>
+            <el-form-item label="装配模式">
+              <el-text>{{ partVersionDetail.mode }}</el-text>
+            </el-form-item>
+            <el-form-item label="分类">
+              <el-text>{{ partVersionDetail.typeId }}</el-text>
+            </el-form-item>
+            <el-form-item label="版本号">
+              <el-text>{{ partVersionDetail.versionId }}</el-text>
+            </el-form-item>
+          </el-form>
+        </el-dialog>
       </el-tab-pane>
     </el-tabs>
     <template #footer>
@@ -224,7 +258,7 @@
 import { reactive, ref, watch, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
-import { Plus, Position, View,Delete } from "@element-plus/icons-vue";
+import { Plus, Position, View, Delete } from "@element-plus/icons-vue";
 import { PartService, ClassificationService } from "@/services/apiServices";
 
 const props = defineProps({
@@ -235,13 +269,30 @@ const props = defineProps({
 const partFormRef = ref(null);
 //默认打开后标签页为基本属性
 const activeTab = ref("basic");
+//切换标签页
 function handleChangeTab(tab) {
- if(activeTab.value === "version" && props.type === "edit"){
-    getPartVersionList();
+  switch (tab) {
+    case "basic":
+      ElMessage("基本属性");
+      break;
+    case "bom":
+      ElMessage("BOM清单");
+      break;
+    case "version":
+      ElMessage("版本管理");
+      getHistoryVersionList();
+      break;
+    default:
+      break;
   }
 }
 //默认显示 基本属性标签页 下的 基本属性面板
 const activeName = ref(["1"]);
+
+/**
+ *增加/删除Part
+
+ */
 //默认单位的枚举值
 // Mm3|capacitance|resistance|Workload|Currency|
 //Percent|Mil|ElectricalPotential|M|volume|Weight|Length|area|Kg|Mm2|Pcs|H|D|WW|WmK
@@ -283,8 +334,6 @@ const partData = ref({
   versionId: "",
   attrMap: {},
 });
-//用于存储BOM清单数据
-const bomData = ref([]);
 //用于存储动态生成的表单项模板 扩展属性
 const exAttributes = ref([]);
 // 获取分类码对应的属性，并动态生成表单项
@@ -402,6 +451,7 @@ const close = () => {
     attrMap: {},
   };
   exAttributes.value = [];
+  partVersionList.value = [];
 };
 
 // 提交表单
@@ -443,26 +493,62 @@ function submitPartForm() {
   });
 }
 
+
+
+/**
+ * BOM清单相关
+ 
+ */
+//用于存储BOM清单数据
+const bomData = ref([]);
+function handleAddSubItem() {}
+
 /**
  * 版本管理相关
  */
 //历史版本列表
 const partVersionList = ref([]);
-function getPartVersionList() {
-  PartService.getPartVersionList(partData.value.masterId).then((res) => {
-    partVersionList.value = res.data.data;
-  }).catch((error) => {
-    ElMessage.error("获取版本列表失败" + error.message);
-  });
+const partVersionDetail = ref({});
+//版本详情弹窗是否显示
+const PartVersionDetailVisible = ref(false);
+//获取历史版本列表
+function getHistoryVersionList() {
+  PartService.getHistoryVersionList(partData.value.masterId)
+    .then((res) => {
+      ElMessage("正在查询历史版本列表" + res.data.message);
+      partVersionList.value = res.data.data;
+    })
+    .catch((error) => {
+      ElMessage.error("获取版本列表失败" + error.message);
+    });
 }
+//查看某个历史版本详情
 function handleGetVersion(row) {
-  PartService.getPartVersionDetail(partData.value.masterId,row.id).then((res) => {
-    ElMessage("正在查询历史版本详情");
-  }).catch((error) => {
-    ElMessage.error("获取版本详情失败" + error.message);
-  });
+  PartService.getPartVersionDetail(partData.value.masterId, row.versionId)
+    .then((res) => {
+      PartVersionDetailVisible.value = true;
+      ElMessage("正在查询历史版本详情");
+      partVersionDetail.value = res.data.data;
+    })
+    .catch((error) => {
+      ElMessage.error("获取版本详情失败: " + error.message);
+    });
+};
+const version = ref("");
+function handleDeleteVersion(row) {
+  version = row.versionId;
+  ElMessage("正在删除版本" + version);
+  PartService.deletePartVersion(partData.value.masterId, version)
+    .then((res) => {
+      getHistoryVersionList();
+      ElMessage.success("删除成功");
+    })
+    .catch((error) => {
+      ElMessage.error("删除失败: " + error.message);
+    });
 }
 defineExpose({ open, close });
+
 </script>
 
 <style lang="scss">
