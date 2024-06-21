@@ -47,7 +47,18 @@
       <el-tabs model-value="0">
         <el-tab-pane :label="labelText">
           <div class="attribute-wrapper">
-            <el-table :data="relevantAttributes">
+            <el-table :data="relevantSelfAttributes">
+              <el-table-column prop="name" label="属性中文名称"/>
+              <el-table-column prop="nameEn" label="属性英文名称"/>
+              <el-table-column prop="description" label="属性中文描述"/>
+              <el-table-column prop="descriptionEn" label="属性英文描述"/>
+              <el-table-column prop="type" label="数据类型"/>
+            </el-table>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane :label="labelTextParent">
+          <div class="attribute-wrapper">
+            <el-table :data="relevantParentAttributes">
               <el-table-column prop="name" label="属性中文名称"/>
               <el-table-column prop="nameEn" label="属性英文名称"/>
               <el-table-column prop="description" label="属性中文描述"/>
@@ -122,7 +133,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { ClassificationService } from '@/services/apiServices'
+import {AttributeService, ClassificationService} from '@/services/apiServices'
 import ThePagination from '@/components/ThePagination.vue'
 import { ElMessage } from 'element-plus';
 
@@ -131,7 +142,8 @@ const filterData = ref({
   classification: ''
 })
 const page = ref({})
-const relevantAttributes = ref([])
+const relevantSelfAttributes = ref([])
+const relevantParentAttributes = ref([])
 const selectedClassificationName = ref('')
 const addClassificationFormVisible = ref(false)
 const editClassificationFormVisible = ref(false)
@@ -153,6 +165,10 @@ const rules = {
 
 const labelText = computed(() => {
   return !!selectedClassificationName.value ? `分类 <${selectedClassificationName.value}> 的属性信息` : '分类属性信息'
+})
+
+const labelTextParent = computed(() => {
+  return !!selectedClassificationName.value ? `分类 <${selectedClassificationName.value}> 从父节点继承的属性信息` : '分类从父节点继承的属性信息'
 })
 
 function filterSubmit() {
@@ -180,7 +196,8 @@ function getClassifications(pageSize, currPage) {
 function handleListAttributes(row) {
   selectedClassificationName.value = row.name
   ClassificationService.getRelevantAttributes(row.id).then(({data}) => {
-    relevantAttributes.value = data.data.parentAttrs.concat(data.data.selfAttrs)
+    relevantSelfAttributes.value = data.data.selfAttrs
+    relevantParentAttributes.value = data.data.parentAttrs
   })
 }
 
