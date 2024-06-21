@@ -95,13 +95,16 @@
       <el-tab-pane label="BOM清单" name="bom" v-if="props.type === 'edit'">
         <div class="bom-management">
           <el-button :icon="Plus" @click="handleAddSubItem" size="small"
-            >新增子项</el-button
+          >新增子项
+          </el-button
           >
           <el-button :icon="Position" @click="searchBOMLists" size="small"
-            >查看BOM清单</el-button
+          >查看BOM清单
+          </el-button
           >
           <el-button :icon="Position" @click="searchParent" size="small"
-            >查看父项</el-button
+          >查看父项
+          </el-button
           >
           <el-table
             :data="bomData"
@@ -167,7 +170,7 @@
               <span class="dialog-footer">
                 <el-button @click="dialogVisible = false">取消</el-button>
                 <el-button type="primary" @click="handleSubmitItem"
-                  >确定</el-button
+                >确定</el-button
                 >
               </span>
             </template>
@@ -203,19 +206,19 @@
             width="120"
           ></el-table-column>
           <el-table-column label="操作" width="150">
-            <template #default="{ row }">
+            <template #default="scope">
               <el-button
                 type="primary"
                 size="small"
                 :icon="View"
-                @click="handleGetVersion(row)"
+                @click="handleGetVersion(scope.row)"
               ></el-button>
               <el-button
                 type="danger"
                 size="small"
                 :icon="Delete"
-                @click="handleDeleteVersion(row)"
-                v-if="row.versionId === partData.value.versionId"
+                @click="handleDeleteVersion(scope.row)"
+                v-if="scope.$index === 0"
               ></el-button>
             </template>
           </el-table-column>
@@ -255,11 +258,11 @@
 </template>
 
 <script setup>
-import { reactive, ref, watch, onMounted } from "vue";
-import { useRoute } from "vue-router";
-import { ElMessage } from "element-plus";
-import { Plus, Position, View, Delete } from "@element-plus/icons-vue";
-import { PartService, ClassificationService } from "@/services/apiServices";
+import {reactive, ref, watch, onMounted} from "vue";
+import {useRoute} from "vue-router";
+import {ElMessage} from "element-plus";
+import {Plus, Position, View, Delete} from "@element-plus/icons-vue";
+import {PartService, ClassificationService} from "@/services/apiServices";
 
 const props = defineProps({
   type: String, // 用于判断是添加还是编辑
@@ -269,23 +272,22 @@ const props = defineProps({
 const partFormRef = ref(null);
 //默认打开后标签页为基本属性
 const activeTab = ref("basic");
+
 //切换标签页
 function handleChangeTab(tab) {
   switch (tab) {
     case "basic":
-      ElMessage("基本属性");
       break;
     case "bom":
-      ElMessage("BOM清单");
       break;
     case "version":
-      ElMessage("版本管理");
       getHistoryVersionList();
       break;
     default:
       break;
   }
 }
+
 //默认显示 基本属性标签页 下的 基本属性面板
 const activeName = ref(["1"]);
 
@@ -297,26 +299,26 @@ const activeName = ref(["1"]);
 // Mm3|capacitance|resistance|Workload|Currency|
 //Percent|Mil|ElectricalPotential|M|volume|Weight|Length|area|Kg|Mm2|Pcs|H|D|WW|WmK
 const defaultUnitOptions = [
-  { value: "Mm3", label: "Mm3" },
-  { value: "capacitance", label: "capacitance" },
-  { value: "resistance", label: "resistance" },
-  { value: "Workload", label: "Workload" },
-  { value: "Currency", label: "Currency" },
-  { value: "Percent", label: "Percent" },
-  { value: "Mil", label: "Mil" },
-  { value: "ElectricalPotential", label: "ElectricalPotential" },
-  { value: "M", label: "M" },
-  { value: "volume", label: "volume" },
-  { value: "Weight", label: "Weight" },
-  { value: "Length", label: "Length" },
-  { value: "area", label: "area" },
-  { value: "Kg", label: "Kg" },
-  { value: "Mm2", label: "Mm2" },
-  { value: "Pcs", label: "Pcs" },
-  { value: "H", label: "H" },
-  { value: "D", label: "D" },
-  { value: "WW", label: "WW" },
-  { value: "WmK", label: "WmK" },
+  {value: "Mm3", label: "Mm3"},
+  {value: "capacitance", label: "capacitance"},
+  {value: "resistance", label: "resistance"},
+  {value: "Workload", label: "Workload"},
+  {value: "Currency", label: "Currency"},
+  {value: "Percent", label: "Percent"},
+  {value: "Mil", label: "Mil"},
+  {value: "ElectricalPotential", label: "ElectricalPotential"},
+  {value: "M", label: "M"},
+  {value: "volume", label: "volume"},
+  {value: "Weight", label: "Weight"},
+  {value: "Length", label: "Length"},
+  {value: "area", label: "area"},
+  {value: "Kg", label: "Kg"},
+  {value: "Mm2", label: "Mm2"},
+  {value: "Pcs", label: "Pcs"},
+  {value: "H", label: "H"},
+  {value: "D", label: "D"},
+  {value: "WW", label: "WW"},
+  {value: "WmK", label: "WmK"},
 ];
 
 const route = useRoute();
@@ -336,6 +338,7 @@ const partData = ref({
 });
 //用于存储动态生成的表单项模板 扩展属性
 const exAttributes = ref([]);
+
 // 获取分类码对应的属性，并动态生成表单项
 function fetchAttributes(classificationId) {
   // 如果处于编辑模式,则获取当前部件的属性
@@ -345,7 +348,7 @@ function fetchAttributes(classificationId) {
         if (classificationId === "") {
           return;
         }
-        const { parentAttrs, selfAttrs } = res.data.data;
+        const {parentAttrs, selfAttrs} = res.data.data;
         const allAttrs = [...parentAttrs, ...selfAttrs];
         exAttributes.value = allAttrs.map((attr) => ({
           ...attr,
@@ -361,7 +364,7 @@ function fetchAttributes(classificationId) {
         if (classificationId === "") {
           return;
         }
-        const { parentAttrs, selfAttrs } = res.data.data;
+        const {parentAttrs, selfAttrs} = res.data.data;
         // 合并父类属性和自己的属性
         const allAttrs = [...parentAttrs, ...selfAttrs];
         // 动态生成表单项
@@ -387,6 +390,7 @@ function fetchAttributes(classificationId) {
       });
   }
 }
+
 // 监听分类码的变化，重新获取属性并更新表单项
 //{"att1": , "att2":,}
 //["att1": ,"att2": ]
@@ -422,6 +426,7 @@ const open = (id) => {
     };
   }
 };
+
 function getDetail(id) {
   PartService.getPartById(id).then((res) => {
     partData.value.id = res.data.data.id;
@@ -494,14 +499,15 @@ function submitPartForm() {
 }
 
 
-
 /**
  * BOM清单相关
- 
+
  */
 //用于存储BOM清单数据
 const bomData = ref([]);
-function handleAddSubItem() {}
+
+function handleAddSubItem() {
+}
 
 /**
  * 版本管理相关
@@ -511,33 +517,32 @@ const partVersionList = ref([]);
 const partVersionDetail = ref({});
 //版本详情弹窗是否显示
 const PartVersionDetailVisible = ref(false);
+
 //获取历史版本列表
 function getHistoryVersionList() {
   PartService.getHistoryVersionList(partData.value.masterId)
     .then((res) => {
-      ElMessage("正在查询历史版本列表" + res.data.message);
       partVersionList.value = res.data.data;
     })
     .catch((error) => {
       ElMessage.error("获取版本列表失败" + error.message);
     });
 }
+
 //查看某个历史版本详情
 function handleGetVersion(row) {
   PartService.getPartVersionDetail(partData.value.masterId, row.versionId)
     .then((res) => {
       PartVersionDetailVisible.value = true;
-      ElMessage("正在查询历史版本详情");
       partVersionDetail.value = res.data.data;
     })
     .catch((error) => {
       ElMessage.error("获取版本详情失败: " + error.message);
     });
 };
-const version = ref("");
+
 function handleDeleteVersion(row) {
-  version = row.versionId;
-  ElMessage("正在删除版本" + version);
+  let version = row.versionId.split(".")[0];
   PartService.deletePartVersion(partData.value.masterId, version)
     .then((res) => {
       getHistoryVersionList();
@@ -547,7 +552,8 @@ function handleDeleteVersion(row) {
       ElMessage.error("删除失败: " + error.message);
     });
 }
-defineExpose({ open, close });
+
+defineExpose({open, close});
 
 </script>
 
