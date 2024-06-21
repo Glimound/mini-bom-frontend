@@ -31,7 +31,14 @@
           <template #default="scope">
             <el-button link type="primary" size="small" @click="handleListAttributes(scope.row)">查看属性</el-button>
             <el-button link type="primary" size="small" @click="handleEditClassification(scope.row)">修改</el-button>
-            <el-button link type="primary" size="small" @click="handleDeleteClassification(scope.row)">删除</el-button>
+            <el-popconfirm confirm-button-text="yes"
+                           cancel-button-text="no"
+                           @confirm="handleDeleteClassification(scope.row)"
+                           title="确认删除属性吗">
+              <template #reference>
+                <el-button link type="primary" size="small">删除</el-button>
+              </template>
+            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
