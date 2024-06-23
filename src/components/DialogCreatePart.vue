@@ -291,7 +291,7 @@
                 size="small"
                 :icon="Delete"
                 @click="handleDeleteVersion(scope.row)"
-                v-if="scope.row.versionId === partData.value.versionId"
+                v-if="scope.$index === 0"
               ></el-button>
             </template>
           </el-table-column>
@@ -379,6 +379,7 @@ function closeDiaglog(done) {
 const partFormRef = ref(null);
 //默认打开后标签页为基本属性
 const activeTab = ref("basic");
+
 //切换标签页
 function handleChangeTab(tab) {
   switch (tab) {
@@ -400,6 +401,7 @@ function handleChangeTab(tab) {
       break;
   }
 }
+
 //默认显示 基本属性标签页 下的 基本属性面板
 const activeName = ref(["1"]);
 
@@ -411,26 +413,26 @@ const activeName = ref(["1"]);
 // Mm3|capacitance|resistance|Workload|Currency|
 //Percent|Mil|ElectricalPotential|M|volume|Weight|Length|area|Kg|Mm2|Pcs|H|D|WW|WmK
 const defaultUnitOptions = [
-  { value: "Mm3", label: "Mm3" },
-  { value: "capacitance", label: "capacitance" },
-  { value: "resistance", label: "resistance" },
-  { value: "Workload", label: "Workload" },
-  { value: "Currency", label: "Currency" },
-  { value: "Percent", label: "Percent" },
-  { value: "Mil", label: "Mil" },
-  { value: "ElectricalPotential", label: "ElectricalPotential" },
-  { value: "M", label: "M" },
-  { value: "volume", label: "volume" },
-  { value: "Weight", label: "Weight" },
-  { value: "Length", label: "Length" },
-  { value: "area", label: "area" },
-  { value: "Kg", label: "Kg" },
-  { value: "Mm2", label: "Mm2" },
-  { value: "Pcs", label: "Pcs" },
-  { value: "H", label: "H" },
-  { value: "D", label: "D" },
-  { value: "WW", label: "WW" },
-  { value: "WmK", label: "WmK" },
+  {value: "Mm3", label: "Mm3"},
+  {value: "capacitance", label: "capacitance"},
+  {value: "resistance", label: "resistance"},
+  {value: "Workload", label: "Workload"},
+  {value: "Currency", label: "Currency"},
+  {value: "Percent", label: "Percent"},
+  {value: "Mil", label: "Mil"},
+  {value: "ElectricalPotential", label: "ElectricalPotential"},
+  {value: "M", label: "M"},
+  {value: "volume", label: "volume"},
+  {value: "Weight", label: "Weight"},
+  {value: "Length", label: "Length"},
+  {value: "area", label: "area"},
+  {value: "Kg", label: "Kg"},
+  {value: "Mm2", label: "Mm2"},
+  {value: "Pcs", label: "Pcs"},
+  {value: "H", label: "H"},
+  {value: "D", label: "D"},
+  {value: "WW", label: "WW"},
+  {value: "WmK", label: "WmK"},
 ];
 
 const route = useRoute();
@@ -450,6 +452,7 @@ const partData = ref({
 });
 //用于存储动态生成的表单项模板 扩展属性
 const exAttributes = ref([]);
+
 // 获取分类码对应的属性，并动态生成表单项
 function fetchAttributes(classificationId) {
   // 如果处于编辑模式,则获取当前部件的属性
@@ -461,7 +464,7 @@ function fetchAttributes(classificationId) {
         ) {
           return;
         }
-        const { parentAttrs, selfAttrs } = res.data.data;
+        const {parentAttrs, selfAttrs} = res.data.data;
         const allAttrs = [...parentAttrs, ...selfAttrs];
         exAttributes.value = allAttrs.map((attr) => ({
           ...attr,
@@ -478,7 +481,7 @@ function fetchAttributes(classificationId) {
           res.data.data.selfAttrs.length === 0) {
           return;
         }
-        const { parentAttrs, selfAttrs } = res.data.data;
+        const {parentAttrs, selfAttrs} = res.data.data;
         // 合并父类属性和自己的属性
         const allAttrs = [...parentAttrs, ...selfAttrs];
         // 动态生成表单项
@@ -504,6 +507,7 @@ function fetchAttributes(classificationId) {
       });
   }
 }
+
 // 监听分类码的变化，重新获取属性并更新表单项
 //{"att1": , "att2":,}
 //["att1": ,"att2": ]
@@ -539,6 +543,7 @@ const open = (id) => {
     };
   }
 };
+
 function getDetail(id) {
   PartService.getPartById(id).then((res) => {
     partData.value.id = res.data.data.id;
@@ -750,6 +755,7 @@ const partVersionList = ref([]);
 const partVersionDetail = ref({});
 //版本详情弹窗是否显示
 const PartVersionDetailVisible = ref(false);
+
 //获取历史版本列表
 function getHistoryVersionList() {
   PartService.getHistoryVersionList(partData.value.masterId)
@@ -760,6 +766,7 @@ function getHistoryVersionList() {
       ElMessage.error("获取版本列表失败" + error.message);
     });
 }
+
 //查看某个历史版本详情
 function handleGetVersion(row) {
   PartService.getPartVersionDetail(partData.value.masterId, row.versionId)
@@ -770,7 +777,8 @@ function handleGetVersion(row) {
     .catch((error) => {
       ElMessage.error("获取版本详情失败: " + error.message);
     });
-}
+};
+
 function handleDeleteVersion(row) {
   let version = row.versionId.split(".")[0];
   PartService.deletePartVersion(partData.value.masterId, version)
