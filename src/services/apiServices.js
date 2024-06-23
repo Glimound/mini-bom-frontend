@@ -53,13 +53,7 @@ export const ApiService = {
   },
   put(resource, data) {
     return axiosClient.put(resource, data)
-  },
-  /*deleteByPath(resource) {
-    return axiosClient.delete(resource)
-  },
-  deleteByParams(resource, params) {
-    return axiosClient.delete(resource, params)
-  }*/
+  }
 }
 
 export const UserService = {

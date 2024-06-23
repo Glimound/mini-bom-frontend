@@ -161,7 +161,7 @@
       @selection-change="attributeSelectionChange"
       ref="editingAttributesTableRef"
     >
-      <el-table-column type="selection" :selectable="attributeSelectable" width="50"/>
+      <el-table-column type="selection" :selectable="attributeSelectable"/>
       <el-table-column prop="name" label="属性中文名称"/>
       <el-table-column prop="nameEn" label="属性英文名称"/>
       <el-table-column prop="description" label="属性中文描述"/>
@@ -179,30 +179,80 @@
 
   <el-dialog v-model="editClassificationFormVisible" title="修改分类" style="padding: 35px;" :show-close="false" :fullscreen="true">
     <el-form :model="classificationForm" :rules="rules" ref="classificationFormRef" label-width="100px" style="padding: 5px 10px 0px 10px;">
-      <el-form-item label="分类码" prop="businessCode">
-        <el-input v-model="classificationForm.businessCode" disabled/>
-      </el-form-item>
-      <el-form-item label="中文名称" prop="name">
-        <el-input v-model="classificationForm.name"/>
-      </el-form-item>
-      <el-form-item label="英文名称" prop="nameEn">
-        <el-input v-model="classificationForm.nameEn"/>
-      </el-form-item>
-      <el-form-item label="中文描述" prop="description">
-        <el-input v-model="classificationForm.description" type="textarea"/>
-      </el-form-item>
-      <el-form-item label="英文描述" prop="descriptionEn">
-        <el-input v-model="classificationForm.descriptionEn" type="textarea"/>
-      </el-form-item>
-      <el-form-item label="属性状态" prop="disableFlag">
-        <el-radio-group v-model="classificationForm.disableFlag">
-          <el-radio :value="false">有效</el-radio>
-          <el-radio :value="true">无效</el-radio>
-        </el-radio-group>
-      </el-form-item>
+      <div class="form-row">
+        <div class="form-column">
+          <el-form-item label="分类码" prop="businessCode">
+            <el-input v-model="classificationForm.businessCode" disabled/>
+          </el-form-item>
+          <el-form-item label="中文名称" prop="name">
+            <el-input v-model="classificationForm.name"/>
+          </el-form-item>
+          <el-form-item label="中文描述" prop="description">
+            <el-input v-model="classificationForm.description" type="textarea"/>
+          </el-form-item>
+          
+        </div>
+        <div class="form-column">
+          <el-form-item label="属性状态" prop="disableFlag">
+            <el-radio-group v-model="classificationForm.disableFlag">
+              <el-radio :value="false">有效</el-radio>
+              <el-radio :value="true">无效</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="英文名称" prop="nameEn">
+            <el-input v-model="classificationForm.nameEn"/>
+          </el-form-item>
+          <el-form-item label="英文描述" prop="descriptionEn">
+            <el-input v-model="classificationForm.descriptionEn" type="textarea"/>
+          </el-form-item>
+        </div>
+      </div>
+      <el-divider class="divider"/>
+      <div class="edit-attributes-wrapper">
+        <div>
+          <p>属性信息</p>
+          <el-divider direction="vertical" />
+          <el-button type="primary" @click="editingRelevantAttributes=true">新增</el-button>
+          <span v-if="editingRelevantAttributes">
+            <el-select
+              v-model="searchAttributesInput"
+              filterable
+              remote
+              placeholder="输入属性关键词以进行搜索"
+              :remote-method="searchAttributes"
+              :loading="searchAttributesLoading"
+              style="width: 300px; margin: 0px 10px;"
+            >
+              <el-option
+                v-for="item in searchAttributesOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+            <el-button @click="addRelevantAttributes">确认</el-button>
+          </span>
+          <el-divider direction="vertical" />
+          <el-button @click="deleteRevelantAttributes">删除</el-button>
+        </div>
+      </div>
     </el-form>
+    <el-table
+      :data="editRelevantAttributesData"
+      :row-class-name="tableRowClassName"
+      @selection-change="attributeSelectionChange"
+      ref="editingAttributesTableRef"
+    >
+      <el-table-column type="selection" :selectable="attributeSelectable" width="50"/>
+      <el-table-column prop="name" label="属性中文名称"/>
+      <el-table-column prop="nameEn" label="属性英文名称"/>
+      <el-table-column prop="description" label="属性中文描述"/>
+      <el-table-column prop="descriptionEn" label="属性英文描述"/>
+      <el-table-column prop="type" label="数据类型"/>
+      <el-table-column prop="stateDesc" label="说明"/>
+    </el-table>
     <template #footer>
-      <div class="dialog-footer" style="padding: 10px 10px;">
+      <div class="dialog-footer" style="padding: 5px 10px;">
         <el-button @click="classificationFormCancel">取消</el-button>
         <el-button type="primary" @click="editClassificationSubmit">确认</el-button>
       </div>
@@ -371,11 +421,27 @@ function handleEditClassification(row) {
     disableFlag: row.disableFlag,
     parentNodeId: ''
   }
+  ClassificationService.getRelevantAttributes(row.id).then(({data}) => {
+    let arr = []
+    arr = arr.concat(data.data.parentAttrs)
+    arr.forEach(item => {
+      item.state = 'immutable',
+      item.stateDesc = '<继承自父节点>'
+    });
+    arr = arr.concat(data.data.selfAttrs)
+    editRelevantAttributesData.value = arr
+  })
+    
 }
 
 function editClassificationSubmit() {
   classificationFormRef.value.validate((valid) => {
     if (valid) {
+      let newClassificationForm = classificationForm.value
+      delete newClassificationForm.parentNodeId
+      delete newClassificationForm.businessCode
+      newClassificationForm.addAttrIds = addAttrIds.value
+      newClassificationForm.deleteAttrIds = deleteAttrIds.value
       ClassificationService.updateClassification(classificationForm.value).then(({data}) => {
         classificationFormCancel()
         if (data.code === 200) {
@@ -496,6 +562,7 @@ function deleteRevelantAttributes() {
     }
   })
   selectedAttributes.value = []
+  editingAttributesTableRef.value.clearSelection()
 }
 
 function attributeSelectionChange(value) {
