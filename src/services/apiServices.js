@@ -53,13 +53,7 @@ export const ApiService = {
   },
   put(resource, data) {
     return axiosClient.put(resource, data)
-  },
-  /*deleteByPath(resource) {
-    return axiosClient.delete(resource)
-  },
-  deleteByParams(resource, params) {
-    return axiosClient.delete(resource, params)
-  }*/
+  }
 }
 
 export const UserService = {
@@ -148,6 +142,16 @@ export const ClassificationService = {
   },
   updateClassification(body) {
     return ApiService.post('/type/update', body)
+  },
+  getTreeRoots() {
+    return ApiService.get('/type/tree/roots')
+  },
+  getNodeChildren(id) {
+    return ApiService.query('/type/tree/children', {
+      params: {
+        id: id
+      }
+    })
   }
 }
 

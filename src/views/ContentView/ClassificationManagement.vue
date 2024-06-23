@@ -31,8 +31,8 @@
           <template #default="scope">
             <el-button link type="primary" size="small" @click="handleListAttributes(scope.row)">查看属性</el-button>
             <el-button link type="primary" size="small" @click="handleEditClassification(scope.row)">修改</el-button>
-            <el-popconfirm confirm-button-text="yes"
-                           cancel-button-text="no"
+            <el-popconfirm confirm-button-text="是"
+                           cancel-button-text="否"
                            @confirm="handleDeleteClassification(scope.row)"
                            title="确认删除属性吗">
               <template #reference>
@@ -78,24 +78,97 @@
     />
   </div>
 
-  <el-dialog v-model="addClassificationFormVisible" title="新增分类" style="padding: 20px;">
-    <el-form :model="classificationForm" :rules="rules" ref="classificationFormRef" label-width="80px" style="padding: 5px 10px 0px 10px;">
-      <el-form-item label="分类码" prop="businessCode">
-        <el-input v-model="classificationForm.businessCode"/>
-      </el-form-item>
-      <el-form-item label="中文名称" prop="name">
-        <el-input v-model="classificationForm.name"/>
-      </el-form-item>
-      <el-form-item label="英文名称" prop="nameEn">
-        <el-input v-model="classificationForm.nameEn"/>
-      </el-form-item>
-      <el-form-item label="中文描述" prop="description">
-        <el-input v-model="classificationForm.description" type="textarea"/>
-      </el-form-item>
-      <el-form-item label="英文描述" prop="descriptionEn">
-        <el-input v-model="classificationForm.descriptionEn" type="textarea"/>
-      </el-form-item>
+  <el-dialog v-model="addClassificationFormVisible" title="新增分类" style="padding: 35px;" :show-close="false" :fullscreen="true">
+    <el-form :model="classificationForm" :rules="rules" ref="classificationFormRef" label-width="100px" style="padding: 5px 10px 0px 10px;">
+      <div class="form-row">
+        <div class="form-column">
+          <el-form-item label="分类码" prop="businessCode">
+            <el-input v-model="classificationForm.businessCode"/>
+          </el-form-item>
+          <el-form-item label="中文名称" prop="name">
+            <el-input v-model="classificationForm.name"/>
+          </el-form-item>
+          <el-form-item label="中文描述" prop="description">
+            <el-input v-model="classificationForm.description" type="textarea"/>
+          </el-form-item>
+          <el-form-item label="属性状态" prop="disableFlag">
+            <el-radio-group v-model="classificationForm.disableFlag">
+              <el-radio :value="false">有效</el-radio>
+              <el-radio :value="true">无效</el-radio>
+            </el-radio-group>
+          </el-form-item>
+        </div>
+        <div class="form-column">
+          <el-form-item label="分类父节点" prop="parentNodeId">
+            <el-select
+              v-model="classificationForm.parentNodeId"
+              filterable
+              remote
+              placeholder="输入分类关键词以进行搜索"
+              :remote-method="searchClassifications"
+              :loading="searchClassificationsLoading"
+              @change="loadParentAttributes"
+            >
+              <el-option
+                v-for="item in searchClassificationsOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="英文名称" prop="nameEn">
+            <el-input v-model="classificationForm.nameEn"/>
+          </el-form-item>
+          <el-form-item label="英文描述" prop="descriptionEn">
+            <el-input v-model="classificationForm.descriptionEn" type="textarea"/>
+          </el-form-item>
+        </div>
+      </div>
+      <el-divider class="divider"/>
+      <div class="edit-attributes-wrapper">
+        <div>
+          <p>属性信息</p>
+          <el-divider direction="vertical" />
+          <el-button type="primary" @click="editingRelevantAttributes=true">新增</el-button>
+          <span v-if="editingRelevantAttributes">
+            <el-select
+              v-model="searchAttributesInput"
+              filterable
+              remote
+              placeholder="输入属性关键词以进行搜索"
+              :remote-method="searchAttributes"
+              :loading="searchAttributesLoading"
+              style="width: 300px; margin: 0px 10px;"
+            >
+              <el-option
+                v-for="item in searchAttributesOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+            <el-button @click="addRelevantAttributes">确认</el-button>
+          </span>
+          <el-divider direction="vertical" />
+          <el-button @click="deleteRevelantAttributes">删除</el-button>
+        </div>
+      </div>
     </el-form>
+    <el-table
+      :data="editRelevantAttributesData"
+      :row-class-name="tableRowClassName"
+      @selection-change="attributeSelectionChange"
+      ref="editingAttributesTableRef"
+    >
+      <el-table-column type="selection" :selectable="attributeSelectable"/>
+      <el-table-column prop="name" label="属性中文名称"/>
+      <el-table-column prop="nameEn" label="属性英文名称"/>
+      <el-table-column prop="description" label="属性中文描述"/>
+      <el-table-column prop="descriptionEn" label="属性英文描述"/>
+      <el-table-column prop="type" label="数据类型"/>
+      <el-table-column prop="stateDesc" label="说明"/>
+    </el-table>
     <template #footer>
       <div class="dialog-footer" style="padding: 5px 10px;">
         <el-button @click="classificationFormCancel">取消</el-button>
@@ -104,24 +177,80 @@
     </template>
   </el-dialog>
 
-  <el-dialog v-model="editClassificationFormVisible" title="修改分类" style="padding: 20px;">
-    <el-form :model="classificationForm" :rules="rules" ref="classificationFormRef" label-width="80px" style="padding: 5px 10px 0px 10px;">
-      <el-form-item label="分类码" prop="businessCode">
-        <el-input v-model="classificationForm.businessCode" disabled/>
-      </el-form-item>
-      <el-form-item label="中文名称" prop="name">
-        <el-input v-model="classificationForm.name"/>
-      </el-form-item>
-      <el-form-item label="英文名称" prop="nameEn">
-        <el-input v-model="classificationForm.nameEn"/>
-      </el-form-item>
-      <el-form-item label="中文描述" prop="description">
-        <el-input v-model="classificationForm.description" type="textarea"/>
-      </el-form-item>
-      <el-form-item label="英文描述" prop="descriptionEn">
-        <el-input v-model="classificationForm.descriptionEn" type="textarea"/>
-      </el-form-item>
+  <el-dialog v-model="editClassificationFormVisible" title="修改分类" style="padding: 35px;" :show-close="false" :fullscreen="true">
+    <el-form :model="classificationForm" :rules="rules" ref="classificationFormRef" label-width="100px" style="padding: 5px 10px 0px 10px;">
+      <div class="form-row">
+        <div class="form-column">
+          <el-form-item label="分类码" prop="businessCode">
+            <el-input v-model="classificationForm.businessCode" disabled/>
+          </el-form-item>
+          <el-form-item label="中文名称" prop="name">
+            <el-input v-model="classificationForm.name"/>
+          </el-form-item>
+          <el-form-item label="中文描述" prop="description">
+            <el-input v-model="classificationForm.description" type="textarea"/>
+          </el-form-item>
+          
+        </div>
+        <div class="form-column">
+          <el-form-item label="属性状态" prop="disableFlag">
+            <el-radio-group v-model="classificationForm.disableFlag">
+              <el-radio :value="false">有效</el-radio>
+              <el-radio :value="true">无效</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="英文名称" prop="nameEn">
+            <el-input v-model="classificationForm.nameEn"/>
+          </el-form-item>
+          <el-form-item label="英文描述" prop="descriptionEn">
+            <el-input v-model="classificationForm.descriptionEn" type="textarea"/>
+          </el-form-item>
+        </div>
+      </div>
+      <el-divider class="divider"/>
+      <div class="edit-attributes-wrapper">
+        <div>
+          <p>属性信息</p>
+          <el-divider direction="vertical" />
+          <el-button type="primary" @click="editingRelevantAttributes=true">新增</el-button>
+          <span v-if="editingRelevantAttributes">
+            <el-select
+              v-model="searchAttributesInput"
+              filterable
+              remote
+              placeholder="输入属性关键词以进行搜索"
+              :remote-method="searchAttributes"
+              :loading="searchAttributesLoading"
+              style="width: 300px; margin: 0px 10px;"
+            >
+              <el-option
+                v-for="item in searchAttributesOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+            <el-button @click="addRelevantAttributes">确认</el-button>
+          </span>
+          <el-divider direction="vertical" />
+          <el-button @click="deleteRevelantAttributes">删除</el-button>
+        </div>
+      </div>
     </el-form>
+    <el-table
+      :data="editRelevantAttributesData"
+      :row-class-name="tableRowClassName"
+      @selection-change="attributeSelectionChange"
+      ref="editingAttributesTableRef"
+    >
+      <el-table-column type="selection" :selectable="attributeSelectable" width="50"/>
+      <el-table-column prop="name" label="属性中文名称"/>
+      <el-table-column prop="nameEn" label="属性英文名称"/>
+      <el-table-column prop="description" label="属性中文描述"/>
+      <el-table-column prop="descriptionEn" label="属性英文描述"/>
+      <el-table-column prop="type" label="数据类型"/>
+      <el-table-column prop="stateDesc" label="说明"/>
+    </el-table>
     <template #footer>
       <div class="dialog-footer" style="padding: 5px 10px;">
         <el-button @click="classificationFormCancel">取消</el-button>
@@ -129,11 +258,26 @@
       </div>
     </template>
   </el-dialog>
+
+  <el-dialog class="attr-conn" v-model="attributeConnectionTableVisible" title="分类-属性关联" style="padding: 20px;">
+    <el-table v-loading="attributeConnectionLoading" :data="attributeConnection" :border="true">
+      <el-table-column fixed prop="classificationName" align="center" width="120"/>
+      <el-table-column v-for="attr in allAttributes" :label="attr.name" :prop="attr.id" align="center"/>
+    </el-table>
+  </el-dialog>
+
+  <el-dialog v-model="classificationTreeVisible" title="分类树" style="padding: 20px 30px;">
+    <el-tree
+      :props="props"
+      :load="loadNode"
+      lazy
+    />
+  </el-dialog>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import {AttributeService, ClassificationService} from '@/services/apiServices'
+import { AttributeService, ClassificationService } from '@/services/apiServices'
 import ThePagination from '@/components/ThePagination.vue'
 import { ElMessage } from 'element-plus';
 
@@ -152,16 +296,43 @@ const classificationForm = ref({
   name: '',
   nameEn: '',
   description: '',
-  descriptionEn: ''
+  descriptionEn: '',
+  disableFlag: false,
+  parentNodeId: ''
 })
 const classificationFormRef = ref(null)
+const editRelevantAttributesData = ref([])
+const deleteAttrIds = ref([])
+const addAttrIds = ref([])
+const editingAttributesTableRef = ref(null)
+const editingRelevantAttributes = ref(false)
+const selectedAttributes = ref([])
+const searchAttributesInput = ref('')
+const searchAttributesLoading = ref(false)
+const searchAttributesOptions = ref([])
+const searchClassificationsLoading = ref(false)
+const searchClassificationsOptions = ref([])
 const rules = {
   businessCode: [{ required: true, message: '分类码不能为空', trigger: 'blur' }],
   name: [{ required: true, message: '中文名称不能为空', trigger: 'blur' }],
   description: [{ required: true, message: '中文描述不能为空', trigger: 'blur' }],
   nameEn: [{ required: true, message: '英文名称不能为空', trigger: 'blur' }],
-  descriptionEn: [{ required: true, message: '英文描述不能为空', trigger: 'blur' }]
-};
+  descriptionEn: [{ required: true, message: '英文描述不能为空', trigger: 'blur' }],
+  disableFlag: [{ required: true, message: '属性状态不能为空', trigger: 'change' }]
+}
+const classificationTreeVisible = ref(false)
+const props = {
+  label: (data) => {
+    return `${data.businessCode} - ${data.name} - ${data.nameEn}`
+  },
+  isLeaf: (data) => {
+    return data.leafFlag
+  }
+}
+const attributeConnectionTableVisible = ref(false)
+const attributeConnection = ref([])
+const allAttributes = ref([])
+const attributeConnectionLoading = ref(false)
 
 const labelText = computed(() => {
   return !!selectedClassificationName.value ? `分类 <${selectedClassificationName.value}> 的属性信息` : '分类属性信息'
@@ -213,14 +384,22 @@ function classificationFormCancel() {
     name: '',
     nameEn: '',
     description: '',
-    descriptionEn: ''
+    descriptionEn: '',
+    disableFlag: false,
+    parentNodeId: ''
   }
+  editRelevantAttributesData.value = []
+  deleteAttrIds.value = []
+  addAttrIds.value = []
+  editingRelevantAttributes.value = false
 }
 
 function addClassificationSubmit() {
   classificationFormRef.value.validate((valid) => {
     if (valid) {
-      ClassificationService.createClassification(classificationForm.value).then(({data}) => {
+      let newClassificationForm = classificationForm.value
+      newClassificationForm.attrIds = addAttrIds.value
+      ClassificationService.createClassification(newClassificationForm).then(({data}) => {
         classificationFormCancel()
         if (data.code === 200) {
           ElMessage({
@@ -266,13 +445,31 @@ function handleEditClassification(row) {
     name: row.name,
     nameEn: row.nameEn,
     description: row.description,
-    descriptionEn: row.descriptionEn
+    descriptionEn: row.descriptionEn,
+    disableFlag: row.disableFlag,
+    parentNodeId: ''
   }
+  ClassificationService.getRelevantAttributes(row.id).then(({data}) => {
+    let arr = []
+    arr = arr.concat(data.data.parentAttrs)
+    arr.forEach(item => {
+      item.state = 'immutable',
+      item.stateDesc = '<继承自父节点>'
+    });
+    arr = arr.concat(data.data.selfAttrs)
+    editRelevantAttributesData.value = arr
+  })
+    
 }
 
 function editClassificationSubmit() {
   classificationFormRef.value.validate((valid) => {
     if (valid) {
+      let newClassificationForm = classificationForm.value
+      delete newClassificationForm.parentNodeId
+      delete newClassificationForm.businessCode
+      newClassificationForm.addAttrIds = addAttrIds.value
+      newClassificationForm.deleteAttrIds = deleteAttrIds.value
       ClassificationService.updateClassification(classificationForm.value).then(({data}) => {
         classificationFormCancel()
         if (data.code === 200) {
@@ -292,6 +489,177 @@ function editClassificationSubmit() {
       return false;
     }
   });
+}
+
+function searchAttributes(query) {
+  if (query !== '') {
+    searchAttributesLoading.value = true
+    // get attributes by id
+    AttributeService.getAttributes(999, 1, query).then(({data}) => {
+      let attributes = data.data.data
+      // remove attributes in current classifications
+      attributes = attributes.filter((item) => {
+        return !editRelevantAttributesData.value.some((attr) => {
+          return attr.id === item.id
+        })
+      })
+      // remove attributes in already added attributes
+      attributes = attributes.filter((item) => {
+        return !addAttrIds.value.includes(item.id)
+      })
+      searchAttributesOptions.value = attributes.map((item) => {
+        return {
+          value: item.id,
+          label: `${item.name} - ${item.nameEn}`,
+          data: {
+            id: item.id,
+            name: item.name,
+            nameEn: item.nameEn,
+            description: item.description,
+            descriptionEn: item.descriptionEn,
+            type: item.type
+          }
+        }
+      })
+      searchAttributesLoading.value = false
+    })
+  } else {
+    searchAttributesOptions.value = []
+  }
+}
+
+function searchClassifications(query) {
+  if (query !== '') {
+    searchClassificationsLoading.value = true
+    // get classifictions by id
+    ClassificationService.getClassifications(999, 1, query).then(({data}) => {
+      searchClassificationsOptions.value = data.data.data.map((item) => {
+        return {
+          value: item.id,
+          label: `${item.name} - ${item.nameEn}`
+        }
+      })
+      searchClassificationsLoading.value = false
+    })
+  } else {
+    searchClassificationsOptions.value = []
+  }
+}
+
+function loadParentAttributes() {
+  ClassificationService.getRelevantAttributes(classificationForm.value.parentNodeId).then(({data}) => {
+    let arr = []
+    arr = arr.concat(data.data.parentAttrs)
+    arr = arr.concat(data.data.selfAttrs)
+    arr.forEach(item => {
+      item.state = 'immutable',
+      item.stateDesc = '<继承自父节点>'
+    });
+    editRelevantAttributesData.value = arr
+  })
+}
+
+function addRelevantAttributes() {
+  let selectedAttr = searchAttributesOptions.value.find((item) => {
+    return item.value === searchAttributesInput.value
+  })
+  if (selectedAttr) {
+    selectedAttr.data.state = 'add'
+    selectedAttr.data.stateDesc = '<新增属性>'
+    editRelevantAttributesData.value.push(selectedAttr.data)
+    addAttrIds.value.push(selectedAttr.data.id)
+    searchAttributesInput.value = ''
+    searchAttributesOptions.value = []
+    editingRelevantAttributes.value = false
+  }
+}
+
+function deleteRevelantAttributes() {
+  selectedAttributes.value.forEach(item => {
+    if (addAttrIds.value.includes(item.id)) {
+      addAttrIds.value = addAttrIds.value.filter((id) => {
+        return id !== item.id
+      })
+      editRelevantAttributesData.value = editRelevantAttributesData.value.filter((attr) => {
+        return attr.id !== item.id
+      })
+    } else if (!deleteAttrIds.value.includes(item.id)) {
+      item.state = 'delete'
+      item.stateDesc = '<删除属性>'
+      deleteAttrIds.value.push(item.id)
+    }
+  })
+  selectedAttributes.value = []
+  editingAttributesTableRef.value.clearSelection()
+}
+
+function attributeSelectionChange(value) {
+  selectedAttributes.value = value
+}
+
+function attributeSelectable(row) {
+  return row.state !== 'immutable'
+}
+
+function tableRowClassName({row}) {
+  if (row.state === 'immutable') {
+    return 'immutable-row'
+  } else if (row.state === 'add') {
+    return 'add-row'
+  } else if (row.state === 'delete') {
+    return 'delete-row'
+  } else {
+    return ''
+  }
+}
+
+function displayClassificationTree() {
+  classificationTreeVisible.value = true
+}
+
+function loadNode(node, resolve) {
+  if (node.level === 0) {
+    ClassificationService.getTreeRoots().then(({data}) => {
+      resolve(data.data)
+    })
+  } else if (node.level > 0) {
+    ClassificationService.getNodeChildren(node.data.id).then(({data}) => {
+      resolve(data.data)
+    })
+  }
+}
+
+function displayAttributeConnection() {
+  getGridData()
+  attributeConnectionTableVisible.value = true
+}
+
+async function getGridData() {
+  attributeConnectionLoading.value = true
+  const { data: classificationData } = await ClassificationService.getClassifications(999, 1, '')
+  const allClassifications = classificationData.data.data
+
+  const { data: attributeData } = await AttributeService.getAttributes(999, 1, '')
+  const allAttributeIds = attributeData.data.data.map((attr) => ({
+    id: attr.id,
+    name: attr.name
+  }))
+  allAttributes.value = allAttributeIds
+
+  const promises = allClassifications.map(async (classification) => {
+    const row = {
+      classificationName: classification.name
+    }
+    const { data: relevantAttributesData } = await ClassificationService.getRelevantAttributes(classification.id)
+    const attrs = relevantAttributesData.data.selfAttrs.concat(relevantAttributesData.data.parentAttrs).map((attr) => attr.id)
+    allAttributeIds.forEach((attrInfo) => {
+      row[attrInfo.id] = attrs.includes(attrInfo.id) ? '√' : ''
+    })
+    return row
+  })
+
+  attributeConnection.value = await Promise.all(promises)
+  attributeConnectionLoading.value = false
 }
 
 onMounted(() => {
@@ -403,4 +771,79 @@ onMounted(() => {
     padding-bottom: 10px;
   }
 }
+
+.el-dialog {
+  display: flex;
+  flex-direction: column;
+
+  .el-dialog__body {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  .form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+  }
+
+  .form-column {
+    flex: 1;
+    min-width: 300px;
+  }
+
+  .divider {
+    margin: 5px 0px 5px 0px;
+  }
+
+  .edit-attributes-wrapper {
+    padding: 5px 0px;
+    display: flex;
+    align-items: center;
+
+    p {
+      display: inline;
+      font-size: 16px;
+      color: #303133;
+    }
+
+    .el-divider {
+      height: 30px;
+      margin: 0px 10px;
+    }
+  }
+
+  .el-table {
+    padding: 0px 20px;
+    width: 100%;
+    flex-grow: 1;
+    
+    .add-row {
+      --el-table-tr-bg-color: #E8F5E9;
+    }
+
+    .delete-row {
+      --el-table-tr-bg-color: #FDEDEC;
+    }
+
+    .immutable-row {
+      --el-table-tr-bg-color: #F5F5F5;
+    }
+  }
+}
+
+.attr-conn {
+  height: 70%;
+
+  .el-dialog__body {
+    height: calc(100% - 40px);
+  }
+
+  .el-table {
+    height: 100%;
+    flex-grow: 0;
+  }
+}
+
 </style>
