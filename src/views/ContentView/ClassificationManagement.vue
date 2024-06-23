@@ -259,17 +259,19 @@
     </template>
   </el-dialog>
 
+  <el-dialog class="attr-conn" v-model="attributeConnectionTableVisible" title="分类-属性关联" style="padding: 20px;">
+    <el-table v-loading="attributeConnectionLoading" :data="attributeConnection" :border="true">
+      <el-table-column fixed prop="classificationName" align="center" width="120"/>
+      <el-table-column v-for="attr in allAttributes" :label="attr.name" :prop="attr.id" align="center"/>
+    </el-table>
+  </el-dialog>
+
   <el-dialog v-model="classificationTreeVisible" title="分类树" style="padding: 20px 30px;">
     <el-tree
       :props="props"
       :load="loadNode"
       lazy
     />
-    <template #footer>
-      <div class="dialog-footer" style="padding: 5px 10px;">
-        <el-button type="primary" @click="classificationTreeVisible = false">关闭</el-button>
-      </div>
-    </template>
   </el-dialog>
 </template>
 
@@ -327,6 +329,10 @@ const props = {
     return data.leafFlag
   }
 }
+const attributeConnectionTableVisible = ref(false)
+const attributeConnection = ref([])
+const allAttributes = ref([])
+const attributeConnectionLoading = ref(false)
 
 const labelText = computed(() => {
   return !!selectedClassificationName.value ? `分类 <${selectedClassificationName.value}> 的属性信息` : '分类属性信息'
@@ -622,6 +628,40 @@ function loadNode(node, resolve) {
     })
   }
 }
+
+function displayAttributeConnection() {
+  getGridData()
+  attributeConnectionTableVisible.value = true
+}
+
+async function getGridData() {
+  attributeConnectionLoading.value = true
+  const { data: classificationData } = await ClassificationService.getClassifications(999, 1, '')
+  const allClassifications = classificationData.data.data
+
+  const { data: attributeData } = await AttributeService.getAttributes(999, 1, '')
+  const allAttributeIds = attributeData.data.data.map((attr) => ({
+    id: attr.id,
+    name: attr.name
+  }))
+  allAttributes.value = allAttributeIds
+
+  const promises = allClassifications.map(async (classification) => {
+    const row = {
+      classificationName: classification.name
+    }
+    const { data: relevantAttributesData } = await ClassificationService.getRelevantAttributes(classification.id)
+    const attrs = relevantAttributesData.data.selfAttrs.concat(relevantAttributesData.data.parentAttrs).map((attr) => attr.id)
+    allAttributeIds.forEach((attrInfo) => {
+      row[attrInfo.id] = attrs.includes(attrInfo.id) ? '√' : ''
+    })
+    return row
+  })
+
+  attributeConnection.value = await Promise.all(promises)
+  attributeConnectionLoading.value = false
+}
+
 onMounted(() => {
   getClassifications(10, 1)
 })
@@ -790,6 +830,19 @@ onMounted(() => {
     .immutable-row {
       --el-table-tr-bg-color: #F5F5F5;
     }
+  }
+}
+
+.attr-conn {
+  height: 70%;
+
+  .el-dialog__body {
+    height: calc(100% - 40px);
+  }
+
+  .el-table {
+    height: 100%;
+    flex-grow: 0;
   }
 }
 
