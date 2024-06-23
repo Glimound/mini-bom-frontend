@@ -2,7 +2,7 @@
   <div class="part-management">
     <el-container>
       <el-radio-group class="query-radios" v-model="queryType">
-        <el-radio :label="1" @click="resetName">按部件编码查询</el-radio>
+        <el-radio :value="1" @click="resetName">按部件编码查询</el-radio>
         <el-input
           placeholder="请输入部件编码"
           v-model="searchKeywordCode"
@@ -11,7 +11,7 @@
           style="width: 20%"
           clearable
         ></el-input>
-        <el-radio :label="2" @click="resetCode">按部件名称查询</el-radio>
+        <el-radio :value="2" @click="resetCode">按部件名称查询</el-radio>
         <el-input
           placeholder="请输入部件名称"
           v-model="searchKeywordName"
