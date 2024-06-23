@@ -258,6 +258,19 @@
       </div>
     </template>
   </el-dialog>
+
+  <el-dialog v-model="classificationTreeVisible" title="分类树" style="padding: 20px 30px;">
+    <el-tree
+      :props="props"
+      :load="loadNode"
+      lazy
+    />
+    <template #footer>
+      <div class="dialog-footer" style="padding: 5px 10px;">
+        <el-button type="primary" @click="classificationTreeVisible = false">关闭</el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>
@@ -304,7 +317,16 @@ const rules = {
   nameEn: [{ required: true, message: '英文名称不能为空', trigger: 'blur' }],
   descriptionEn: [{ required: true, message: '英文描述不能为空', trigger: 'blur' }],
   disableFlag: [{ required: true, message: '属性状态不能为空', trigger: 'change' }]
-};
+}
+const classificationTreeVisible = ref(false)
+const props = {
+  label: (data) => {
+    return `${data.businessCode} - ${data.name} - ${data.nameEn}`
+  },
+  isLeaf: (data) => {
+    return data.leafFlag
+  }
+}
 
 const labelText = computed(() => {
   return !!selectedClassificationName.value ? `分类 <${selectedClassificationName.value}> 的属性信息` : '分类属性信息'
@@ -585,6 +607,21 @@ function tableRowClassName({row}) {
   }
 }
 
+function displayClassificationTree() {
+  classificationTreeVisible.value = true
+}
+
+function loadNode(node, resolve) {
+  if (node.level === 0) {
+    ClassificationService.getTreeRoots().then(({data}) => {
+      resolve(data.data)
+    })
+  } else if (node.level > 0) {
+    ClassificationService.getNodeChildren(node.data.id).then(({data}) => {
+      resolve(data.data)
+    })
+  }
+}
 onMounted(() => {
   getClassifications(10, 1)
 })

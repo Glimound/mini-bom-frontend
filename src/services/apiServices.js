@@ -142,6 +142,16 @@ export const ClassificationService = {
   },
   updateClassification(body) {
     return ApiService.post('/type/update', body)
+  },
+  getTreeRoots() {
+    return ApiService.get('/type/tree/roots')
+  },
+  getNodeChildren(id) {
+    return ApiService.query('/type/tree/children', {
+      params: {
+        id: id
+      }
+    })
   }
 }
 
