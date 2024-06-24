@@ -92,12 +92,10 @@
             </el-form>
           </el-collapse-item>
         </el-collapse>
-        <template #footer>
-          <span class="dialog-footer">
-            <el-button @click="closeDiaglog">取 消</el-button>
-            <el-button type="primary" @click="submitPartForm">提交</el-button>
-          </span>
-        </template>
+        <div class="dialog-footer" style="padding: 5px 10px;">
+          <el-button @click="closeDiaglog">取 消</el-button>
+          <el-button type="primary" @click="submitPartForm">提交</el-button>
+        </div>
       </el-tab-pane>
       <el-tab-pane label="BOM清单" name="bom" v-if="props.type === 'edit'">
         <div class="bom-management">
@@ -348,7 +346,7 @@ const props = defineProps({
   reload: Function, // 添加或修改完后，刷新列表页
 });
 //关闭整个对话框，先重置所有数据,同时标签页指向"基本属性"
-function closeDiaglog(done) {
+function closeDialog(done) {
   visible.value = false;
   // 重置属性表单数据
   partData.value = {
@@ -371,7 +369,7 @@ function closeDiaglog(done) {
   // 标签页指向"基本属性"
   activeTab.value = "basic";
   activeName.value = ["1"];
-  done();
+  //done();
 }
 
 
@@ -459,8 +457,8 @@ function fetchAttributes(classificationId) {
   if (props.type === "edit") {
     ClassificationService.getRelevantAttributes(classificationId)
       .then((res) => {
-        if (classificationId === ""|| res.data.data.parentAttrs.length === 0 ||
-           res.data.data.selfAttrs.length === 0
+        if (classificationId === ""|| (res.data.data.parentAttrs.length === 0 &&
+           res.data.data.selfAttrs.length === 0)
         ) {
           return;
         }
@@ -568,8 +566,8 @@ function submitPartForm() {
           .then((res) => {
             if (res.data.message === "ok") {
               ElMessage.success("添加成功");
-              closeDiaglog();
               props.reload();
+              closeDialog();
             } else {
               ElMessage.error("添加失败:" + res.data.message);
             }
@@ -582,8 +580,8 @@ function submitPartForm() {
           .then((res) => {
             if (res.data.message === "ok") {
               ElMessage.success("修改成功");
-              closeDiaglog();
               props.reload();
+              closeDialog();
             } else {
               ElMessage.error("修改失败:" + res.data.message);
             }
@@ -791,7 +789,7 @@ function handleDeleteVersion(row) {
     });
 }
 //向外暴露的方法
-defineExpose({ open, closeDiaglog });
+defineExpose({ open, closeDiaglog: closeDialog });
 </script>
 
 <style lang="scss">
