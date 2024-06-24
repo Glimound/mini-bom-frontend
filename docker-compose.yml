@@ -2,5 +2,6 @@ version: '3'
 services:
   mini-bom-frontend:
     build: .
+    container_name: mini-bom-frontend
     ports:
-      - "80:80"
+      - "39500:80"
