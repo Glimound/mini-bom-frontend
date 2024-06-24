@@ -2,7 +2,7 @@ import axios from "axios";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import pinia from "@/stores";
-import { getJwtToken } from "@/services/jwtServices";
+import { getJwtToken } from "@/services/localStorageServices";
 
 const controller = new AbortController()
 const router = useRouter()

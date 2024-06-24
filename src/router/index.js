@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { getJwtToken } from '@/services/jwtServices'
+import { getJwtToken, getUsername } from '@/services/localStorageServices'
 import { useAuthStore } from '@/stores/auth'
 
 import DashboardPage from '@/views/DashboardPage.vue'
@@ -80,6 +80,7 @@ const router = createRouter({
 router.beforeEach((to, from) => {
   if (!authStore.authenticated && !!getJwtToken()) {
     authStore.authenticated = true
+    authStore.username = getUsername()
   }
 })
 
