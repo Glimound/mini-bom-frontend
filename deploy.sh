@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PROJECT_DIR=/path/to/your/project
+PROJECT_DIR=/root/mini-bom-frontend
 
 cd $PROJECT_DIR
 git pull origin master
