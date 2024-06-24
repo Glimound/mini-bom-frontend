@@ -25,8 +25,8 @@
           <template #default="scope">
           <el-button link type="primary" size="small" @click="handleListClassifications(scope.row)">查看分类</el-button>
           <el-button link type="primary" size="small" @click="handleEditAttribute(scope.row)">修改</el-button>
-          <el-popconfirm confirm-button-text="yes"
-                         cancel-button-text="no"
+          <el-popconfirm confirm-button-text="是"
+                         cancel-button-text="否"
                          @confirm="handleDeleteAttribute(scope.row)"
                          title="确认删除属性吗">
             <template #reference>
@@ -61,7 +61,7 @@
     />
   </div>
 
-  <el-dialog v-model="addAttributeFormVisible" title="新增属性" style="padding: 20px;">
+  <el-dialog v-model="addAttributeFormVisible" title="新增属性" style="padding: 20px;" :show-close="false">
     <el-form :model="attributeForm" :rules="rules" ref="attributeFormRef" label-width="80px" style="padding: 5px 10px 0px 10px;">
       <el-form-item label="中文名称" prop="name">
         <el-input v-model="attributeForm.name"/>
@@ -103,7 +103,7 @@
     </template>
   </el-dialog>
 
-  <el-dialog v-model="editAttributeFormVisible" title="修改属性" style="padding: 20px;">
+  <el-dialog v-model="editAttributeFormVisible" title="修改属性" style="padding: 20px;" :show-close="false">
     <el-form :model="attributeForm" :rules="rules" ref="attributeFormRef" label-width="80px" style="padding: 5px 10px 0px 10px;">
       <el-form-item label="中文名称" prop="name">
         <el-input v-model="attributeForm.name" disabled/>
@@ -174,9 +174,9 @@ const attributeForm = ref({
 const attributeFormRef = ref(null)
 const rules = {
   name: [{ required: true, message: '中文名称不能为空', trigger: 'blur' }],
-  description: [{ required: true, message: '中文描述不能为空', trigger: 'blur' }],
+  // description: [{ required: true, message: '中文描述不能为空', trigger: 'blur' }],
   nameEn: [{ required: true, message: '英文名称不能为空', trigger: 'blur' }],
-  //descriptionEn: [{ required: true, message: '英文描述不能为空', trigger: 'blur' }],
+  // descriptionEn: [{ required: true, message: '英文描述不能为空', trigger: 'blur' }],
   type: [{ required: true, message: '类型不能为空', trigger: 'change' }],
   precision: [{ required: true, message: '精度不能为空', trigger: 'blur' }],
   length: [{ required: true, message: '长度不能为空', trigger: 'blur' }],
