@@ -274,7 +274,7 @@ function login() {
         error.value = true
         errorMessage.value = data.message
       } else {
-        authStore.login(data.data.token, data.data.uid)
+        authStore.login(data.data.token, loginForm.value.account)
         ElMessage({
           message: '登录成功',
           type: 'success'
@@ -321,7 +321,7 @@ function login() {
         error.value = true
         errorMessage.value = data.message
       } else {
-        authStore.login(data.data.token, data.data.uid)
+        authStore.login(data.data.token, loginForm.value.account)
         ElMessage({
           message: '登录成功',
           type: 'success'

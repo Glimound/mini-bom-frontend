@@ -1,24 +1,28 @@
-import { saveJwtToken, deleteJwtToken } from "@/services/jwtServices";
+import { saveJwtToken, deleteJwtToken, saveUsername, deleteUsername } from "@/services/localStorageServices";
 import { defineStore } from 'pinia'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     authenticated: false,
-    uid: ''
+    username: ''
   }),
   getters: {
-
+    getUsername() {
+      return this.username
+    }
   },
   actions: {
-    login(token, uid) {
+    login(token, username) {
       this.authenticated = true
-      this.uid = uid
+      this.username = username
       saveJwtToken(token)
+      saveUsername(username)
     },
     logout() {
       this.authenticated = false
-      this.uid = ''
+      this.username = ''
       deleteJwtToken()
+      deleteUsername()
     }
   },
 })

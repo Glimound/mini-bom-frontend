@@ -274,7 +274,7 @@ function register() {
         error.value = true
         errorMessage.value = data.message
       } else {
-        authStore.login(data.data.token, data.data.uid)
+        authStore.login(data.data.token, registerForm.value.account)
         ElMessage({
           message: '注册成功，已为您自动登录',
           type: 'success',
@@ -321,7 +321,7 @@ function register() {
         error.value = true
         errorMessage.value = data.message
       } else {
-        authStore.login(data.data.token, data.data.uid)
+        authStore.login(data.data.token, registerForm.value.account)
         ElMessage({
           message: '注册成功，已为您自动登录',
           type: 'success',

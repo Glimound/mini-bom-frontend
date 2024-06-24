@@ -2,14 +2,23 @@
   <div class="toolbar">
     <div class="logo"></div>
     <div class="auth-management">
-      <span>username</span>
-      <span>logout</span>
+      <el-text class="mx-1" small>{{ authStore.username }}</el-text>
+      <el-button type="plain" link small @click="logout">logout</el-button>
     </div>
   </div>
 </template>
 
 <script setup>
+import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
 
+const authStore = useAuthStore()
+const router = useRouter()
+
+const logout = () => {
+  authStore.logout()
+  router.push('/login')
+}
 </script>
 
 <style lang="scss">
@@ -25,16 +34,13 @@
   background-color: white;
 
   .auth-management {
-    width: 80px;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
     margin: 8px 20px 8px 0px;
 
-    span {
-      text-align: center;
-      font-size: 10pt;
-      color: #222226;
+    .el-button {
+      text-decoration: underline;
     }
   }
 }
