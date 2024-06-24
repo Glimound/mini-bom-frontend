@@ -327,6 +327,9 @@
       </el-tab-pane>
     </el-tabs>
   </el-dialog>
+  <el-drawer title="BOM清单" v-model = "BOMListVisible" :before-close="closeBOMList">
+    <el-tree :props = "bomProps" :load="loadBOMNode" lazy/>
+  </el-drawer>
 </template>
 
 <script setup>
@@ -605,12 +608,12 @@ const partList = ref([]);
 //用于存储该Part的子项列表
 const subitemsData = ref([]);
 //子项列表下的单个子项,不是subitemsData的元素,而是其中元素的子集，用于修改数量和位号
-const subitem = {
+const subitem = ref({
   bomLinkId: "",
   buoId: "",
   quantity:Number(null),
   referenceDesignator: "",
-};
+});
 //新增子项、编辑子项的弹窗是否显示 (两个弹窗不同！)
 const addSubitemVisible = ref(false);
 const editSubitemVisible = ref(false);
@@ -627,6 +630,16 @@ const bomLinkData = ref({
 });
 //要添加的子项与父项的关联数据的引用
 const bomLinkDataRef = ref(null);
+//BOM清单弹窗
+const BOMListVisible = ref(false);
+const bomProps = ref({
+  label:(data) =>{
+    return `${data.name}`
+  },
+  isLeaf:(data)=>{
+    return data.haschild ===false
+  }
+});
 //父项列表的弹窗是否显示
 const parentPartVisible = ref(false);
 //该Part的父项列表
@@ -727,13 +740,12 @@ function comfirmAddSubitem(row) {
 }
 //关闭对话框时，重置表单数据,同时刷新该Part的子项列表
 function handleCloseAddSubitemDialog(done) {
-  partList.value = [];
   queryType.value = 2;
   searchById.value = "";
   searchByName.value = "";
   addSubitemVisible.value = false;
   bomLinkDataRef.value.resetFields();
-
+  fetchSubitems();
   done();
 }
 //查询Part列表
@@ -757,9 +769,32 @@ function handleAddSubItem() {
   addSubitemVisible.value = true;
   searchPartList();
 }
-//查看BOM清单 ---------todo
-function searchBOMLists() {}
-
+//点击查看BOM清单
+function searchBOMLists() {
+  BOMListVisible.value = true;
+}
+//加载BOM节点
+function loadBOMNode(node,resolve){
+  if(node.level === 0){
+    resolve([{name:partData.value.name}]);
+  }
+  else if(node.level === 1){
+    BOMService.getSubitems(partData.value.id)
+    .then(({data}) => {
+      resolve(data.data);
+    })
+  }
+  else if(node.level > 1){
+    BOMService.getSubitems(node.data.subjectId)
+    .then(({data}) => {
+      resolve(data.data);
+    })
+  } 
+}
+function closeBOMList(done){
+  BOMListVisible.value = false;
+  done();
+}
 //查看父项
 function searchParent() {
   BOMService.getParents(partData.value.masterId)
