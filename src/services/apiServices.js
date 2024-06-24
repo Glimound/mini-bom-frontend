@@ -251,7 +251,7 @@ export const BOMService = {
     return ApiService.query('/bom/unlink',{
       params:{
         bomLinkId:bomLinkId,
-        bomId:buoId
+        buoId:buoId
       }
     })
   },

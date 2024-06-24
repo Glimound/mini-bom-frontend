@@ -10,7 +10,7 @@
       type="border-card"
       @tab-change="handleChangeTab"
     >
-      <el-tab-pane label="基本属性" name="basic" >
+      <el-tab-pane label="基本属性" name="basic">
         <el-collapse v-model="activeName">
           <el-collapse-item title="基本属性" name="1">
             <el-form :model="partData" label-width="120px" ref="partFormRef">
@@ -92,12 +92,6 @@
             </el-form>
           </el-collapse-item>
         </el-collapse>
-        <template #footer>
-          <span class="dialog-footer">
-            <el-button @click="closeDiaglog">取 消</el-button>
-            <el-button type="primary" @click="submitPartForm">提交</el-button>
-          </span>
-        </template>
       </el-tab-pane>
       <el-tab-pane label="BOM清单" name="bom" v-if="props.type === 'edit'">
         <div class="bom-management">
@@ -121,10 +115,17 @@
               width="150"
             ></el-table-column>
             <el-table-column prop="quantity" label="数量"></el-table-column>
-            <el-table-column prop="referenceDesignator" label="位号"></el-table-column>
+            <el-table-column
+              prop="referenceDesignator"
+              label="位号"
+            ></el-table-column>
             <el-table-column label="操作" width="150">
               <template #default="scope">
-                <el-button size="small" :icon="EditPen" @click="handleEditSubitem(scope.row)"/>
+                <el-button
+                  size="small"
+                  :icon="EditPen"
+                  @click="handleEditSubitem(scope.row)"
+                />
                 <el-popconfirm
                   title="确定删除该子项吗？"
                   confirm-button-text="Yes"
@@ -134,28 +135,32 @@
                   @confirm="handleDeleteSubitem(scope.row)"
                 >
                   <template #reference>
-                    <el-button type="danger" size="small" :icon="Delete"/>
+                    <el-button type="danger" size="small" :icon="Delete" />
                   </template>
-              </el-popconfirm>
+                </el-popconfirm>
               </template>
             </el-table-column>
           </el-table>
-          <el-dialog :model ="editSubitemVisible" title="编辑子项" width="30%" before-close="handleCloseEditSubitem">
+          <el-dialog
+            :model="editSubitemVisible"
+            title="编辑子项"
+            width="90%"
+            :before-close="handleCloseEditSubitem"
+          >
             <el-form :model="subitem" label-width="90px" inline>
               <el-form-item label="数量" prop="quantity">
-                <el-input v-model="subitem.quantity" size="small"></el-input>
+                <el-input v-model="subitem.quantity" size="small" />
               </el-form-item>
               <el-form-item label="位号" prop="referenceDesignator">
-                <el-input
-                  v-model="subitem.referenceDesignator"
-                  size="small"
-                ></el-input>
+                <el-input v-model="subitem.referenceDesignator" size="small" />
               </el-form-item>
             </el-form>
             <template #footer>
               <span class="dialog-footer">
-                <el-button @click="editSubitemVisible = false">取 消</el-button>
-                <el-button type="primary" @click="submitEditSubitem">提交</el-button>
+                <el-button @click="handleCloseEditSubitem">取 消</el-button>
+                <el-button type="primary" @click="submitEditSubitem"
+                  >提交</el-button
+                >
               </span>
             </template>
           </el-dialog>
@@ -321,6 +326,12 @@
         </el-dialog>
       </el-tab-pane>
     </el-tabs>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="closeDiaglog">取 消</el-button>
+        <el-button type="primary" @click="submitPartForm">提交</el-button>
+      </span>
+    </template>
   </el-dialog>
 </template>
 
@@ -387,13 +398,13 @@ function handleChangeTab(tab) {
       break;
     case "bom":
       //选择BOM清单时，若子项列表为空，则渲染子项列表
-      if(subitemsData.value.length === 0){
+      if (subitemsData.value.length === 0) {
         fetchSubitems();
       }
       break;
     case "version":
       //选择版本管理时，若历史版本列表为空，渲染历史版本列表
-      if(partVersionList.value.length === 0){
+      if (partVersionList.value.length === 0) {
         getHistoryVersionList();
       }
       break;
@@ -459,12 +470,13 @@ function fetchAttributes(classificationId) {
   if (props.type === "edit") {
     ClassificationService.getRelevantAttributes(classificationId)
       .then((res) => {
-        if (classificationId === ""|| res.data.data.parentAttrs.length === 0 ||
-           res.data.data.selfAttrs.length === 0
+        if (
+          res.data.data.parentAttrs.length === 0 &&
+          res.data.data.selfAttrs.length === 0
         ) {
           return;
         }
-        const {parentAttrs, selfAttrs} = res.data.data;
+        const { parentAttrs, selfAttrs } = res.data.data;
         const allAttrs = [...parentAttrs, ...selfAttrs];
         exAttributes.value = allAttrs.map((attr) => ({
           ...attr,
@@ -477,11 +489,13 @@ function fetchAttributes(classificationId) {
   } else {
     ClassificationService.getRelevantAttributes(classificationId)
       .then((res) => {
-        if (classificationId === "" || res.data.data.parentAttrs.length === 0 ||
-          res.data.data.selfAttrs.length === 0) {
+        if (
+          res.data.data.parentAttrs.length === 0 &&
+          res.data.data.selfAttrs.length === 0
+        ) {
           return;
         }
-        const {parentAttrs, selfAttrs} = res.data.data;
+        const { parentAttrs, selfAttrs } = res.data.data;
         // 合并父类属性和自己的属性
         const allAttrs = [...parentAttrs, ...selfAttrs];
         // 动态生成表单项
@@ -514,6 +528,7 @@ function fetchAttributes(classificationId) {
 watch(
   () => partData.value.classificationId,
   (newclassificationId) => {
+    if (newclassificationId === "") return;
     fetchAttributes(newclassificationId);
   },
   {
@@ -556,8 +571,6 @@ function getDetail(id) {
     partData.value.attrMap = res.data.data.attrMap;
   });
 }
-
-
 
 // 提交表单
 function submitPartForm() {
@@ -606,12 +619,12 @@ const partList = ref([]);
 //用于存储该Part的子项列表
 const subitemsData = ref([]);
 //子项列表下的单个子项,不是subitemsData的元素,而是其中元素的子集，用于修改数量和位号
-const subitem = {
+const subitem = ref({
   bomLinkId: "",
   buoId: "",
   quantity: "",
   referenceDesignator: "",
-};
+});
 //新增子项、编辑子项的弹窗是否显示 (两个弹窗不同！)
 const addSubitemVisible = ref(false);
 const editSubitemVisible = ref(false);
@@ -650,7 +663,7 @@ function fetchSubitems() {
     });
 }
 //编辑子项
-function handleEditSubitem(row){
+function handleEditSubitem(row) {
   //将选中的子项数据赋值给subitem
   subitem.value.bomLinkId = row.bomLinkId;
   subitem.value.buoId = row.buoId;
@@ -659,17 +672,48 @@ function handleEditSubitem(row){
   //打开编辑子项的对话框
   editSubitemVisible.value = true;
 }
+//提交编辑子项的表单
+function submitEditSubitem() {
+  BOMService.modifyBom(subitem.value)
+    .then((res) => {
+      if (res.data.message === "ok") {
+        ElMessage.success("修改成功");
+        fetchSubitems();
+        handleCloseEditSubitem();
+      } else {
+        ElMessage.error("修改失败:" + res.data.message);
+      }
+    })
+    .catch((error) => {
+      ElMessage.error("修改失败:" + error.message);
+    });
+}
+
+//关闭编辑子项的对话框前，重置subitem数据
+function handleCloseEditSubitem(done) {
+  editSubitemVisible.value = false;
+  subitem.value = {
+    bomLinkId: "",
+    buoId: "",
+    quantity: "",
+    referenceDesignator: "",
+  };
+  done();
+}
 //删除子项
-function handleDeleteSubitem(row){
+function handleDeleteSubitem(row) {
   BOMService.deleteBom(row.bomLinkId, row.buoId)
     .then((res) => {
-      if(res.data.message === "ok"){
+      if (res.data.message === "ok") {
         ElMessage.success("删除成功");
         fetchSubitems();
-      }else{
+      } else {
         ElMessage.error("删除失败:" + res.data.message);
       }
     })
+    .catch((error) => {
+      ElMessage.error("删除失败:" + error.message);
+    });
 }
 //添加子项 --提交表单
 function comfirmAddSubitem(row) {
@@ -705,7 +749,7 @@ function handleCloseAddSubitemDialog(done) {
   searchByName.value = "";
   addSubitemVisible.value = false;
   bomLinkDataRef.value.resetFields();
-
+  fetchSubitems();
   done();
 }
 //查询Part列表
@@ -719,9 +763,11 @@ function searchPartList() {
       }
     });
   } else {
-    PartService.getPartsForBom(partData.value.id,searchByName.value).then((res) => {
-      partList.value = res.data.data.data;
-    });
+    PartService.getPartsForBom(partData.value.id, searchByName.value).then(
+      (res) => {
+        partList.value = res.data.data.data;
+      }
+    );
   }
 }
 //点击“新增子项后”，展开对话框并查询Part列表
@@ -777,14 +823,20 @@ function handleGetVersion(row) {
     .catch((error) => {
       ElMessage.error("获取版本详情失败: " + error.message);
     });
-};
+}
 
 function handleDeleteVersion(row) {
+  if (partVersionList.value.length === 1) {
+    ElMessage.error("删除失败 : 没有其他的历史版本了");
+    return;
+  }
   let version = row.versionId.split(".")[0];
   PartService.deletePartVersion(partData.value.masterId, version)
     .then((res) => {
-      getHistoryVersionList();
-      ElMessage.success("删除成功");
+      if (res.data.message === "ok") {
+        getHistoryVersionList();
+        ElMessage.success("删除成功");
+      } else ElMessage.error(res.data.message);
     })
     .catch((error) => {
       ElMessage.error("删除失败: " + error.message);
