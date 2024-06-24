@@ -3,7 +3,7 @@
     :title="props.type == 'add' ? '添加部件' : '修改部件'"
     v-model="visible"
     width="800px"
-    :before-close="closeDiaglog"
+    :before-close="closeDialog"
   >
     <el-tabs
       v-model="activeTab"
@@ -92,6 +92,10 @@
             </el-form>
           </el-collapse-item>
         </el-collapse>
+        <div class="dialog-footer">
+          <el-button class="cancel" @click="close">取 消</el-button>
+          <el-button class="submitPart" type="primary" @click="submitPartForm">提交</el-button>
+        </div>
       </el-tab-pane>
       <el-tab-pane label="BOM清单" name="bom" v-if="props.type === 'edit'">
         <div class="bom-management">
@@ -114,11 +118,8 @@
               label="名称"
               width="150"
             ></el-table-column>
-            <el-table-column prop="quantity" label="数量"></el-table-column>
-            <el-table-column
-              prop="referenceDesignator"
-              label="位号"
-            ></el-table-column>
+            <el-table-column prop="quantity" label="数量"/>
+            <el-table-column prop="referenceDesignator" label="位号"/>
             <el-table-column label="操作" width="150">
               <template #default="scope">
                 <el-button
@@ -142,9 +143,9 @@
             </el-table-column>
           </el-table>
           <el-dialog
-            :model="editSubitemVisible"
-            title="编辑子项"
-            width="90%"
+            v-model="editSubitemVisible"
+            title="修改子项"
+            width="50%"
             :before-close="handleCloseEditSubitem"
           >
             <el-form :model="subitem" label-width="90px" inline>
@@ -159,7 +160,7 @@
               <span class="dialog-footer">
                 <el-button @click="handleCloseEditSubitem">取 消</el-button>
                 <el-button type="primary" @click="submitEditSubitem"
-                  >提交</el-button
+                  >确定</el-button
                 >
               </span>
             </template>
@@ -326,12 +327,6 @@
         </el-dialog>
       </el-tab-pane>
     </el-tabs>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="closeDiaglog">取 消</el-button>
-        <el-button type="primary" @click="submitPartForm">提交</el-button>
-      </span>
-    </template>
   </el-dialog>
 </template>
 
@@ -339,27 +334,21 @@
 import { reactive, ref, watch, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
-import {
-  Plus,
-  Position,
-  View,
-  EditPen,
-  Delete,
-  Search,
-  InfoFilled
-} from "@element-plus/icons-vue";
-import {
-  PartService,
-  ClassificationService,
-  BOMService,
-} from "@/services/apiServices";
+import {Plus,Position,View,EditPen,Delete,Search,InfoFilled} from "@element-plus/icons-vue";
+import {PartService,ClassificationService,BOMService} from "@/services/apiServices";
 
 const props = defineProps({
   type: String, // 用于判断是添加还是编辑
   reload: Function, // 添加或修改完后，刷新列表页
 });
-//关闭整个对话框，先重置所有数据,同时标签页指向"基本属性"
+
 function closeDialog(done) {
+  close();
+  done();
+}
+//关闭整个对话框，先重置所有数据,同时标签页指向"基本属性"
+function close(){
+  props.reload();
   visible.value = false;
   // 重置属性表单数据
   partData.value = {
@@ -382,9 +371,8 @@ function closeDialog(done) {
   // 标签页指向"基本属性"
   activeTab.value = "basic";
   activeName.value = ["1"];
-  //done();
+  //关闭界面时刷新Part主界面列表
 }
-
 
 //指向part表单的引用
 const partFormRef = ref(null);
@@ -581,8 +569,7 @@ function submitPartForm() {
           .then((res) => {
             if (res.data.message === "ok") {
               ElMessage.success("添加成功");
-              props.reload();
-              closeDialog();
+              close();
             } else {
               ElMessage.error("添加失败:" + res.data.message);
             }
@@ -595,8 +582,7 @@ function submitPartForm() {
           .then((res) => {
             if (res.data.message === "ok") {
               ElMessage.success("修改成功");
-              props.reload();
-              closeDialog();
+              close();
             } else {
               ElMessage.error("修改失败:" + res.data.message);
             }
@@ -622,7 +608,7 @@ const subitemsData = ref([]);
 const subitem = ref({
   bomLinkId: "",
   buoId: "",
-  quantity: "",
+  quantity:Number(null),
   referenceDesignator: "",
 });
 //新增子项、编辑子项的弹窗是否显示 (两个弹窗不同！)
@@ -634,7 +620,7 @@ const searchById = ref("");
 const searchByName = ref("");
 //要添加的子项与父项的关联数据，sourceId:父项id targetMasterId:子项masterid
 const bomLinkData = ref({
-  quantity: null,
+  quantity: Number(null),
   sourceId: "",
   targetMasterId: "",
   referenceDesignator: "",
@@ -674,12 +660,13 @@ function handleEditSubitem(row) {
 }
 //提交编辑子项的表单
 function submitEditSubitem() {
+  subitem.value.quantity = Number(subitem.value.quantity);
   BOMService.modifyBom(subitem.value)
     .then((res) => {
       if (res.data.message === "ok") {
         ElMessage.success("修改成功");
         fetchSubitems();
-        handleCloseEditSubitem();
+        editSubitemVisible.value = false;
       } else {
         ElMessage.error("修改失败:" + res.data.message);
       }
@@ -695,7 +682,7 @@ function handleCloseEditSubitem(done) {
   subitem.value = {
     bomLinkId: "",
     buoId: "",
-    quantity: "",
+    quantity: Number(null),
     referenceDesignator: "",
   };
   done();
@@ -727,7 +714,7 @@ function comfirmAddSubitem(row) {
         ElMessage.success("添加成功");
         //添加成功后重置bombLinkData的数据，同时重新加载Part列表
         bomLinkData.value = {
-          quantity: null,
+          quantity: Number(null),
           sourceId: "",
           targetMasterId: "",
           referenceDesignator: "",
@@ -843,8 +830,19 @@ function handleDeleteVersion(row) {
     });
 }
 //向外暴露的方法
-defineExpose({ open, closeDiaglog: closeDialog });
+defineExpose({ open, close });
 </script>
 
 <style lang="scss">
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding:10px;
+  .cancel {
+    margin-right: 10px;
+  }
+  .submitPart {
+    margin-right: 10px;
+  }
+}
 </style>

@@ -105,7 +105,7 @@
     <DialogCreatePart
       ref="addPart"
       :reload="handleSearch"
-      :type="state.opType"
+      :type="opType"
     />
   </div>
 </template>
@@ -146,9 +146,7 @@ const pageSize = ref(10);
 const total = ref(1);
 //todo: 控制查询方式
 const queryType = ref(2);
-const state = reactive({
-  opType: "add",
-});
+const opType = ref("add");
 //指向DialogCreatePart组件的引用
 const addPart = ref(null);
 
@@ -197,13 +195,13 @@ function handleSearch() {
 
 //创建
 function handleCreate() {
-  state.opType = "add";
+  opType.value = "add";
   addPart.value.open();
 }
 
 //编辑
 function handleEdit(row) {
-  state.opType = "edit";
+  opType.value = "edit";
   addPart.value.open(row.id);
 }
 //删除
