@@ -3,7 +3,7 @@
     <div class="logo"></div>
     <div class="auth-management">
       <el-text class="mx-1" small>{{ authStore.username }}</el-text>
-      <el-button type="plain" link small @click="logout">logout</el-button>
+      <el-button type="info" link small @click="logout">logout</el-button>
     </div>
   </div>
 </template>

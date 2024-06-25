@@ -1,17 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { getJwtToken, getUsername } from '@/services/localStorageServices'
 import { useAuthStore } from '@/stores/auth'
+import pinia from "@/stores";
 
-import DashboardPage from '@/views/DashboardPage.vue'
-import LoginPage from '@/views/LoginPage.vue'
-import RegisterPage from '@/views/RegisterPage.vue'
-import AttributeManagement from '@/views/ContentView/AttributeManagement.vue'
-import ClassificationManagement from '@/views/ContentView/ClassificationManagement.vue'
-import PartManagement from '@/views/ContentView/PartManagement.vue'
-import BlankView from '@/views/ContentView/BlankView.vue'
-
-
-const authStore = useAuthStore()
+const authStore = useAuthStore(pinia)
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -19,7 +11,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'DashboardPage',
-      component: DashboardPage,
+      component: () => import('@/views/DashboardPage.vue'),
       meta: {
         title: '主页'
       },
@@ -27,7 +19,7 @@ const router = createRouter({
         {
           path: '',
           name: 'BlankView',
-          component: BlankView,
+          component: () => import('@/views/ContentView/BlankView.vue'),
           meta: {
             title: '空白页'
           }
@@ -35,7 +27,7 @@ const router = createRouter({
         {
           path: 'attribute-management',
           name: 'AttributeManagement',
-          component: AttributeManagement,
+          component: () => import('@/views/ContentView/AttributeManagement.vue'),
           meta: {
             title: '属性管理'
           }
@@ -43,7 +35,7 @@ const router = createRouter({
         {
           path: 'classification-management',
           name: 'ClassificationManagement',
-          component: ClassificationManagement,
+          component: () => import('@/views/ContentView/ClassificationManagement.vue'),
           meta: {
             title: '分类管理'
           }
@@ -51,7 +43,7 @@ const router = createRouter({
         {
           path: 'part-management',
           name: 'PartManagement',
-          component: PartManagement,
+          component: () => import('@/views/ContentView/PartManagement.vue'),
           meta: {
             title: 'Part&BOM管理'
           }
@@ -61,7 +53,7 @@ const router = createRouter({
     {
       path: '/login',
       name: 'LoginPage',
-      component: LoginPage,
+      component: () => import('@/views/LoginPage.vue'),
       meta: {
         title: '登录'
       }
@@ -69,7 +61,7 @@ const router = createRouter({
     {
       path: '/register',
       name: 'RegisterPage',
-      component: RegisterPage,
+      component: () => import('@/views/RegisterPage.vue'),
       meta: {
         title: '注册'
       }
