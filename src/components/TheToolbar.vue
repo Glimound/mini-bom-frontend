@@ -1,9 +1,13 @@
 <template>
   <div class="toolbar">
-    <div class="logo"></div>
+    <div class="logo">
+      <el-image style="width: 35px; height: 35px" src="./src/assets/logo-l.png" :fit="fit" />
+      <el-divider direction="vertical" style="height: 30px; margin: 0px 10px;"/>
+      <el-image style="width: 100px; height: 20px" src="./src/assets/logo-r.png" :fit="fit" />
+    </div>
     <div class="auth-management">
       <el-text class="mx-1" small>{{ authStore.username }}</el-text>
-      <el-button type="plain" link small @click="logout">logout</el-button>
+      <el-button type="info" link small @click="logout">logout</el-button>
     </div>
   </div>
 </template>
@@ -27,11 +31,19 @@ const logout = () => {
   height: 50px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
   z-index: 20;
   position: fixed;
   top: 0px;
   background-color: white;
+
+  .logo {
+    margin: 2px 0px 0px 25px;
+    display: flex;
+    align-items: center;
+
+  }
 
   .auth-management {
     display: flex;
