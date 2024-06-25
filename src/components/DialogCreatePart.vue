@@ -66,11 +66,18 @@
                   <el-option label="Part" value="Part"></el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="分类" prop="classificationId" required>
-                <el-input
-                  v-model="partData.classificationId"
-                  size="small"
-                ></el-input>
+              <el-form-item label="分类" prop="typeBizCode" required>
+                <el-tree-select  lazy 
+                  :load="loadTypeBizCodeNode" 
+                  :props="treeProps" 
+                  placeholder="请选择分类码" 
+                  check-strictly
+                  v-model="partData.typeBizCode"
+                  value-key="businessCode"
+                  node-key="businessCode"
+                  @node-click="handleComfirmTypeBizCode"
+                  size="small">
+                </el-tree-select>
               </el-form-item>
             </el-form>
           </el-collapse-item>
@@ -328,7 +335,7 @@
     </el-tabs>
   </el-dialog>
   <el-drawer title="BOM清单" v-model = "BOMListVisible" :before-close="closeBOMList">
-    <el-tree :props = "bomProps" :load="loadBOMNode" lazy/>
+    <el-tree :props = "bomProps" :load="loadBOMNode" :key="updateTree" lazy/>
   </el-drawer>
 </template>
 
@@ -361,6 +368,7 @@ function close(){
     source: "",
     partType: "",
     classificationId: "",
+    typeBizCode: "",
     versionId: "",
     attrMap: {},
   };
@@ -402,10 +410,8 @@ function handleChangeTab(tab) {
       break;
   }
 }
-
 //默认显示 基本属性标签页 下的 基本属性面板
 const activeName = ref(["1"]);
-
 /**
  *增加/删除Part
 
@@ -448,12 +454,38 @@ const partData = ref({
   source: "",
   partType: "",
   classificationId: "",
+  typeBizCode: "",
   versionId: "",
   attrMap: {},
 });
 //用于存储动态生成的表单项模板 扩展属性
 const exAttributes = ref([]);
-
+//分类树的节点属性
+const treeProps = ref({
+  label: (data) => {
+    return `${data.businessCode} - ${data.name} - ${data.nameEn}`
+  },
+  isLeaf: (data) => {
+    return data.leafFlag
+  },
+});
+function loadTypeBizCodeNode(node,resolve){
+  if (node && node.level == 0) {
+    ClassificationService.getTreeRoots().then(({data}) => {
+      resolve(data.data)
+    })
+  } else if (node.level > 0) {
+    ClassificationService.getNodeChildren(node.data.id).then(({data}) => {
+      resolve(data.data)
+    })
+  }
+  else {
+    resolve([])
+  }
+}
+function handleComfirmTypeBizCode(node){
+  partData.value.classificationId = node.id;
+}
 // 获取分类码对应的属性，并动态生成表单项
 function fetchAttributes(classificationId) {
   // 如果处于编辑模式,则获取当前部件的属性
@@ -539,6 +571,7 @@ const open = (id) => {
       source: "",
       partType: "",
       classificationId: "",
+      typeBizCode: "",
       versionId: "",
       attrMap: {},
     };
@@ -554,6 +587,7 @@ function getDetail(id) {
     partData.value.versionId = res.data.data.versionId;
     partData.value.partType = res.data.data.mode;
     partData.value.classificationId = res.data.data.typeId;
+    partData.value.typeBizCode = res.data.data.typeBizCode;
     partData.value.attrMap = res.data.data.attrMap;
   });
 }
@@ -636,10 +670,8 @@ const bomProps = ref({
   label:(data) =>{
     return `${data.name}`
   },
-  isLeaf:(data)=>{
-    return data.haschild ===false
-  }
 });
+const updateTree = ref(0);
 //父项列表的弹窗是否显示
 const parentPartVisible = ref(false);
 //该Part的父项列表
@@ -771,6 +803,7 @@ function handleAddSubItem() {
 }
 //点击查看BOM清单
 function searchBOMLists() {
+  updateTree.value++;
   BOMListVisible.value = true;
 }
 //加载BOM节点

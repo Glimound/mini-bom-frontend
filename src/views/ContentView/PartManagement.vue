@@ -45,29 +45,11 @@
       height="350"
     >
       <el-table-column type="index" width="55" fixed="left" />
-      <el-table-column
-        prop="id"
-        label="部件编码"
-        width="180"
-        fixed
-      ></el-table-column>
-      <el-table-column
-        prop="name"
-        label="部件名称"
-        width="180"
-      ></el-table-column>
-      <el-table-column
-        prop="versionId"
-        label="版本号"
-        width="180"
-      ></el-table-column>
-      <el-table-column
-        prop="mode"
-        label="装配模式"
-        width="180"
-      ></el-table-column>
-      <el-table-column prop="typeId" label="分类编码" width="180">
-      </el-table-column>
+      <el-table-column prop="id" label="部件编码" width="180" fixed/>
+      <el-table-column prop="name" label="部件名称" width="180"/>
+      <el-table-column prop="versionId" label="版本号" width="180"/>
+      <el-table-column  prop="mode" label="装配模式" width="180"/>
+      <el-table-column prop="typeBizCode" label="分类码" width="180"/>
       <el-table-column label="操作" fixed="right" width="120">
         <template #default="{ row }">
           <el-button
