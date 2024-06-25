@@ -1,9 +1,9 @@
 <template>
   <div class="toolbar">
     <div class="logo">
-      <el-image style="width: 35px; height: 35px" src="./src/assets/logo-l.png" :fit="fit" />
+      <el-image style="width: 35px; height: 35px" src="./assets/logo-l.png" :fit="fit" />
       <el-divider direction="vertical" style="height: 30px; margin: 0px 10px;"/>
-      <el-image style="width: 100px; height: 20px" src="./src/assets/logo-r.png" :fit="fit" />
+      <el-image style="width: 100px; height: 20px" src="./assets/logo-r.png" :fit="fit" />
     </div>
     <div class="auth-management">
       <el-text class="mx-1" small>{{ authStore.username }}</el-text>
