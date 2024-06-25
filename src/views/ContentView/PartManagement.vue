@@ -2,7 +2,7 @@
   <div class="part-management">
     <el-container>
       <el-radio-group class="query-radios" v-model="queryType">
-        <el-radio :label="1" @click="resetName">按部件编码查询</el-radio>
+        <el-radio :value="1" @click="resetName">按部件编码查询</el-radio>
         <el-input
           placeholder="请输入部件编码"
           v-model="searchKeywordCode"
@@ -11,7 +11,7 @@
           style="width: 20%"
           clearable
         ></el-input>
-        <el-radio :label="2" @click="resetCode">按部件名称查询</el-radio>
+        <el-radio :value="2" @click="resetCode">按部件名称查询</el-radio>
         <el-input
           placeholder="请输入部件名称"
           v-model="searchKeywordName"
@@ -30,6 +30,7 @@
         查询
       </el-button>
     </el-container>
+    <el-divider class="divider" />
     <el-button
       class="createButton"
       type="primary"
@@ -104,7 +105,7 @@
     <DialogCreatePart
       ref="addPart"
       :reload="handleSearch"
-      :type="state.opType"
+      :type="opType"
     />
   </div>
 </template>
@@ -145,9 +146,7 @@ const pageSize = ref(10);
 const total = ref(1);
 //todo: 控制查询方式
 const queryType = ref(2);
-const state = reactive({
-  opType: "add",
-});
+const opType = ref("add");
 //指向DialogCreatePart组件的引用
 const addPart = ref(null);
 
@@ -196,13 +195,13 @@ function handleSearch() {
 
 //创建
 function handleCreate() {
-  state.opType = "add";
+  opType.value = "add";
   addPart.value.open();
 }
 
 //编辑
 function handleEdit(row) {
-  state.opType = "edit";
+  opType.value = "edit";
   addPart.value.open(row.id);
 }
 //删除

@@ -156,7 +156,7 @@ export const ClassificationService = {
 }
 
 export const PartService = {
-  //根据关键词查询Part列表，关键词为“”时查询所有Part
+  //根据关键词查询Part列表，关键词为""时查询所有Part
   getParts(keyword,pageSize,currPage){
     return ApiService.query(`/part/find/keyword/${pageSize}/${currPage}`,{
       params:{
@@ -164,9 +164,26 @@ export const PartService = {
       }
     })
   },
+  //根据关键词查询Part列表(得到的是不在此Part并查集中的Part，防止父子项嵌套),用于新增子项
+  getPartsForBom(id,keyword){
+    return ApiService.query(`/part/find/not_related`,{
+      params:{
+        id:id,
+        keyword:keyword
+      }
+    })
+  },
   //根据Part ID查询Part
   getPartById(id){
     return ApiService.query('/part/find/id',{
+      params:{
+        id:id
+      }
+    })
+  },
+  //根据Part ID查询Part,用于新增子项
+  getPartByIdForBom(id){
+    return ApiService.query('/part/find/id/not_related_id',{
       params:{
         id:id
       }
@@ -180,7 +197,6 @@ export const PartService = {
   modifyPart(data){
     return ApiService.post('/part/modify',data)
   },
-
   //删除Part
   deletePart(id){
     return ApiService.query('/part/delete',{
@@ -206,12 +222,49 @@ export const PartService = {
       }
     })
   },
-  deletePartVersion(masterId,versionId){
+  //删除Part的最新版本
+  deletePartVersion(masterId,version){
     return ApiService.query('/part/history/del',{
       params:{
         masterId:masterId,
-        version:versionId
+        version:version
       }
     })
   }
+}
+
+export const BOMService = {
+  //创建子项
+  createBom(data){
+    return ApiService.post('/bom/subject/link',data)
+  },
+  //查看子项列表
+  getSubitems(id){
+    return ApiService.query(`/bom/subject/show`,{
+      params:{
+        id:id
+      }
+    })
+  },
+  //修改子项
+  modifyBom(data){
+    return ApiService.post('/bom/modify',data)
+  },
+  //删除子项
+  deleteBom(bomLinkId,buoId){
+    return ApiService.query('/bom/unlink',{
+      params:{
+        bomLinkId:bomLinkId,
+        buoId:buoId
+      }
+    })
+  },
+  //查看父项
+  getParents(masterId){
+    return ApiService.query('/bom/subject/parent',{
+      params:{
+        masterId:masterId
+      }
+    })
+  },
 }
