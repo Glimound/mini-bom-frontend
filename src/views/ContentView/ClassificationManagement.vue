@@ -34,7 +34,7 @@
             <el-popconfirm confirm-button-text="是"
                            cancel-button-text="否"
                            @confirm="handleDeleteClassification(scope.row)"
-                           title="确认删除属性吗">
+                           title="确认删除分类吗">
               <template #reference>
                 <el-button link type="primary" size="small">删除</el-button>
               </template>
