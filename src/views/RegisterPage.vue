@@ -2,7 +2,7 @@
   <div class="form-container">
     <el-form :model="registerForm">
       <p>欢迎注册</p>
-      <el-alert v-if="error" :title="errorMessage" type="error" show-icon :closable="false" />
+      <el-alert v-if="error" :title="errorMessage" type="error" show-icon :closable="false"/>
       <el-form-item>
         <el-input
           class="input"
@@ -55,7 +55,10 @@
       </el-form-item>
       <el-form-item>
         <div class="toggle-area">
-          <el-button @click="toggleChange" class="button-text" type="primary" link>{{ registerTypeButtonText }}</el-button>
+          <el-button @click="toggleChange" class="button-text" type="primary" link>{{
+              registerTypeButtonText
+            }}
+          </el-button>
           <el-button @click="routeToLogin" class="button-text" type="primary" link>登录帐号</el-button>
         </div>
       </el-form-item>
@@ -64,12 +67,12 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { User, Lock, Message } from '@element-plus/icons-vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import { UserService } from '@/services/apiServices'
-import { ElMessage } from 'element-plus'
+import {ref, computed} from 'vue'
+import {User, Lock, Message} from '@element-plus/icons-vue'
+import {useRouter} from 'vue-router'
+import {useAuthStore} from '@/stores/auth'
+import {UserService} from '@/services/apiServices'
+import {ElMessage} from 'element-plus'
 
 const registerForm = ref({
   account: '',
@@ -257,7 +260,7 @@ function register() {
       errorMessage.value = "验证码不能为空"
       return
     }
-    
+
     // set status
     error.value = false
     registerLoading.value = true
@@ -355,7 +358,7 @@ function routeToLogin() {
     padding: 20px 40px 20px 40px;
     background: white;
     border-radius: 6px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 
     .el-form-item {
       margin-top: 15px;
@@ -398,7 +401,7 @@ function routeToLogin() {
 
       :first-child {
         font-size: 13px;
-      } 
+      }
     }
 
     .input {

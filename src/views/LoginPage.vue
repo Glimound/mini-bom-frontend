@@ -2,7 +2,7 @@
   <div class="form-container">
     <el-form :model="loginForm">
       <p>欢迎登录</p>
-      <el-alert v-if="error" :title="errorMessage" type="error" show-icon :closable="false" />
+      <el-alert v-if="error" :title="errorMessage" type="error" show-icon :closable="false"/>
       <el-form-item>
         <el-input
           class="input"
@@ -64,12 +64,12 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { User, Lock, Message } from '@element-plus/icons-vue'
-import { useRouter } from 'vue-router';
-import { UserService } from '@/services/apiServices';
-import { useAuthStore } from '@/stores/auth'
-import { ElMessage } from 'element-plus';
+import {ref, computed} from 'vue';
+import {User, Lock, Message} from '@element-plus/icons-vue'
+import {useRouter} from 'vue-router';
+import {UserService} from '@/services/apiServices';
+import {useAuthStore} from '@/stores/auth'
+import {ElMessage} from 'element-plus';
 
 const loginForm = ref({
   account: '',
@@ -257,7 +257,7 @@ function login() {
       errorMessage.value = "验证码不能为空"
       return
     }
-    
+
     // set status
     error.value = false
     loginLoading.value = true
@@ -355,7 +355,7 @@ function routeToRegister() {
     padding: 20px 40px 20px 40px;
     background: white;
     border-radius: 6px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 
     .el-form-item {
       margin-top: 15px;
@@ -398,7 +398,7 @@ function routeToRegister() {
 
       :first-child {
         font-size: 13px;
-      } 
+      }
     }
 
     .input {

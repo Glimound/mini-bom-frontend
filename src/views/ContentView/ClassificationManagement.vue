@@ -78,8 +78,10 @@
     />
   </div>
 
-  <el-dialog v-model="addClassificationFormVisible" title="新增分类" style="padding: 35px;" :show-close="false" :fullscreen="true">
-    <el-form :model="classificationForm" :rules="rules" ref="classificationFormRef" label-width="100px" style="padding: 5px 10px 0px 10px;">
+  <el-dialog v-model="addClassificationFormVisible" title="新增分类" style="padding: 35px;" :show-close="false"
+             :fullscreen="true">
+    <el-form :model="classificationForm" :rules="rules" ref="classificationFormRef" label-width="100px"
+             style="padding: 5px 10px 0px 10px;">
       <div class="form-row">
         <div class="form-column">
           <el-form-item label="分类码" prop="businessCode">
@@ -129,7 +131,7 @@
       <div class="edit-attributes-wrapper">
         <div>
           <p>属性信息</p>
-          <el-divider direction="vertical" />
+          <el-divider direction="vertical"/>
           <el-button type="primary" @click="editingRelevantAttributes=true">新增</el-button>
           <span v-if="editingRelevantAttributes">
             <el-select
@@ -150,7 +152,7 @@
             </el-select>
             <el-button @click="addRelevantAttributes">确认</el-button>
           </span>
-          <el-divider direction="vertical" />
+          <el-divider direction="vertical"/>
           <el-button @click="deleteRevelantAttributes">删除</el-button>
         </div>
       </div>
@@ -177,8 +179,10 @@
     </template>
   </el-dialog>
 
-  <el-dialog v-model="editClassificationFormVisible" title="修改分类" style="padding: 35px;" :show-close="false" :fullscreen="true">
-    <el-form :model="classificationForm" :rules="rules" ref="classificationFormRef" label-width="100px" style="padding: 5px 10px 0px 10px;">
+  <el-dialog v-model="editClassificationFormVisible" title="修改分类" style="padding: 35px;" :show-close="false"
+             :fullscreen="true">
+    <el-form :model="classificationForm" :rules="rules" ref="classificationFormRef" label-width="100px"
+             style="padding: 5px 10px 0px 10px;">
       <div class="form-row">
         <div class="form-column">
           <el-form-item label="分类码" prop="businessCode">
@@ -190,7 +194,7 @@
           <el-form-item label="中文描述" prop="description">
             <el-input v-model="classificationForm.description" type="textarea"/>
           </el-form-item>
-          
+
         </div>
         <div class="form-column">
           <el-form-item label="属性状态" prop="disableFlag">
@@ -211,7 +215,7 @@
       <div class="edit-attributes-wrapper">
         <div>
           <p>属性信息</p>
-          <el-divider direction="vertical" />
+          <el-divider direction="vertical"/>
           <el-button type="primary" @click="editingRelevantAttributes=true">新增</el-button>
           <span v-if="editingRelevantAttributes">
             <el-select
@@ -232,7 +236,7 @@
             </el-select>
             <el-button @click="addRelevantAttributes">确认</el-button>
           </span>
-          <el-divider direction="vertical" />
+          <el-divider direction="vertical"/>
           <el-button @click="deleteRevelantAttributes">删除</el-button>
         </div>
       </div>
@@ -276,10 +280,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { AttributeService, ClassificationService } from '@/services/apiServices'
+import {ref, computed, onMounted} from 'vue'
+import {AttributeService, ClassificationService} from '@/services/apiServices'
 import ThePagination from '@/components/ThePagination.vue'
-import { ElMessage } from 'element-plus';
+//import { ElMessage } from 'element-plus';
 
 const classificationData = ref([])
 const filterData = ref({
@@ -313,12 +317,12 @@ const searchAttributesOptions = ref([])
 const searchClassificationsLoading = ref(false)
 const searchClassificationsOptions = ref([])
 const rules = {
-  businessCode: [{ required: true, message: '分类码不能为空', trigger: 'blur' }],
-  name: [{ required: true, message: '中文名称不能为空', trigger: 'blur' }],
-  description: [{ required: true, message: '中文描述不能为空', trigger: 'blur' }],
-  nameEn: [{ required: true, message: '英文名称不能为空', trigger: 'blur' }],
-  descriptionEn: [{ required: true, message: '英文描述不能为空', trigger: 'blur' }],
-  disableFlag: [{ required: true, message: '属性状态不能为空', trigger: 'change' }]
+  businessCode: [{required: true, message: '分类码不能为空', trigger: 'blur'}],
+  name: [{required: true, message: '中文名称不能为空', trigger: 'blur'}],
+  description: [{required: true, message: '中文描述不能为空', trigger: 'blur'}],
+  nameEn: [{required: true, message: '英文名称不能为空', trigger: 'blur'}],
+  descriptionEn: [{required: true, message: '英文描述不能为空', trigger: 'blur'}],
+  disableFlag: [{required: true, message: '属性状态不能为空', trigger: 'change'}]
 }
 const classificationTreeVisible = ref(false)
 const props = {
@@ -354,11 +358,11 @@ function handlePageChange(curPage, pageSizes) {
 
 function getClassifications(pageSize, currPage) {
   ClassificationService.getClassifications(pageSize, currPage, filterData.value.classification)
-  .then(({data}) => {
-    classificationData.value = data.data.data
-    page.value.curPage = data.data.page.curPage
-    page.value.pageSize = data.data.page.pageSize
-  })
+    .then(({data}) => {
+      classificationData.value = data.data.data
+      page.value.curPage = data.data.page.curPage
+      page.value.pageSize = data.data.page.pageSize
+    })
   ClassificationService.getClassificationCount(filterData.value.classification).then(({data}) => {
     page.value.totalRows = data.data
   })
@@ -454,12 +458,12 @@ function handleEditClassification(row) {
     arr = arr.concat(data.data.parentAttrs)
     arr.forEach(item => {
       item.state = 'immutable',
-      item.stateDesc = '<继承自父节点>'
+        item.stateDesc = '<继承自父节点>'
     });
     arr = arr.concat(data.data.selfAttrs)
     editRelevantAttributesData.value = arr
   })
-    
+
 }
 
 function editClassificationSubmit() {
@@ -553,7 +557,7 @@ function loadParentAttributes() {
     arr = arr.concat(data.data.selfAttrs)
     arr.forEach(item => {
       item.state = 'immutable',
-      item.stateDesc = '<继承自父节点>'
+        item.stateDesc = '<继承自父节点>'
     });
     editRelevantAttributesData.value = arr
   })
@@ -636,10 +640,10 @@ function displayAttributeConnection() {
 
 async function getGridData() {
   attributeConnectionLoading.value = true
-  const { data: classificationData } = await ClassificationService.getClassifications(999, 1, '')
+  const {data: classificationData} = await ClassificationService.getClassifications(999, 1, '')
   const allClassifications = classificationData.data.data
 
-  const { data: attributeData } = await AttributeService.getAttributes(999, 1, '')
+  const {data: attributeData} = await AttributeService.getAttributes(999, 1, '')
   const allAttributeIds = attributeData.data.data.map((attr) => ({
     id: attr.id,
     name: attr.name
@@ -650,7 +654,7 @@ async function getGridData() {
     const row = {
       classificationName: classification.name
     }
-    const { data: relevantAttributesData } = await ClassificationService.getRelevantAttributes(classification.id)
+    const {data: relevantAttributesData} = await ClassificationService.getRelevantAttributes(classification.id)
     const attrs = relevantAttributesData.data.selfAttrs.concat(relevantAttributesData.data.parentAttrs).map((attr) => attr.id)
     allAttributeIds.forEach((attrInfo) => {
       row[attrInfo.id] = attrs.includes(attrInfo.id) ? '√' : ''
@@ -678,7 +682,7 @@ onMounted(() => {
   .classification-wrapper {
     padding: 0px 10px 0px 10px;
     height: calc((100% - 115px) * 0.7);
-    
+
     .el-table {
       height: 100%;
     }
@@ -818,7 +822,7 @@ onMounted(() => {
     padding: 0px 20px;
     width: 100%;
     flex-grow: 1;
-    
+
     .add-row {
       --el-table-tr-bg-color: #E8F5E9;
     }

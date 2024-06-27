@@ -2,16 +2,16 @@
   <div class="attribute-management">
     <div class="filter-box">
       <el-form :inline="true" :model="filterData">
-      <el-form-item label="属性信息查询">
-        <el-input class="input" v-model="filterData.attribute" placeholder="请输入关键字" clearable/>
-      </el-form-item>
-      <el-form-item>
-        <el-button class="button-submit" type="primary" @click="filterSubmit">查询</el-button>
-      </el-form-item>
-      <el-form-item style="margin-left: auto;">
-        <el-button class="button-submit" type="primary" @click="addAttribute">新增属性</el-button>
-      </el-form-item>
-    </el-form>
+        <el-form-item label="属性信息查询">
+          <el-input class="input" v-model="filterData.attribute" placeholder="请输入关键字" clearable/>
+        </el-form-item>
+        <el-form-item>
+          <el-button class="button-submit" type="primary" @click="filterSubmit">查询</el-button>
+        </el-form-item>
+        <el-form-item style="margin-left: auto;">
+          <el-button class="button-submit" type="primary" @click="addAttribute">新增属性</el-button>
+        </el-form-item>
+      </el-form>
     </div>
     <el-divider class="divider"/>
     <div class="attribute-wrapper">
@@ -23,17 +23,17 @@
         <el-table-column prop="type" label="数据类型"/>
         <el-table-column fixed="right" label="操作" width="180">
           <template #default="scope">
-          <el-button link type="primary" size="small" @click="handleListClassifications(scope.row)">查看分类</el-button>
-          <el-button link type="primary" size="small" @click="handleEditAttribute(scope.row)">修改</el-button>
-          <el-popconfirm confirm-button-text="是"
-                         cancel-button-text="否"
-                         @confirm="handleDeleteAttribute(scope.row)"
-                         title="确认删除属性吗">
-            <template #reference>
-              <el-button link type="primary" size="small">删除</el-button>
-            </template>
-          </el-popconfirm>
-        </template>
+            <el-button link type="primary" size="small" @click="handleListClassifications(scope.row)">查看分类</el-button>
+            <el-button link type="primary" size="small" @click="handleEditAttribute(scope.row)">修改</el-button>
+            <el-popconfirm confirm-button-text="是"
+                           cancel-button-text="否"
+                           @confirm="handleDeleteAttribute(scope.row)"
+                           title="确认删除属性吗">
+              <template #reference>
+                <el-button link type="primary" size="small">删除</el-button>
+              </template>
+            </el-popconfirm>
+          </template>
         </el-table-column>
       </el-table>
     </div>
@@ -62,7 +62,8 @@
   </div>
 
   <el-dialog v-model="addAttributeFormVisible" title="新增属性" style="padding: 20px;" :show-close="false">
-    <el-form :model="attributeForm" :rules="rules" ref="attributeFormRef" label-width="80px" style="padding: 5px 10px 0px 10px;">
+    <el-form :model="attributeForm" :rules="rules" ref="attributeFormRef" label-width="80px"
+             style="padding: 5px 10px 0px 10px;">
       <el-form-item label="中文名称" prop="name">
         <el-input v-model="attributeForm.name"/>
       </el-form-item>
@@ -77,9 +78,9 @@
       </el-form-item>
       <el-form-item label="类型" prop="type">
         <el-select v-model="attributeForm.type" placeholder="选择属性类型">
-          <el-option label="TEXT" value="TEXT" />
-          <el-option label="INTEGER" value="INTEGER" />
-          <el-option label="DECIMAL" value="DECIMAL" />
+          <el-option label="TEXT" value="TEXT"/>
+          <el-option label="INTEGER" value="INTEGER"/>
+          <el-option label="DECIMAL" value="DECIMAL"/>
         </el-select>
       </el-form-item>
       <el-form-item v-if="attributeForm.type == 'DECIMAL'" label="精度" prop="precision">
@@ -104,7 +105,8 @@
   </el-dialog>
 
   <el-dialog v-model="editAttributeFormVisible" title="修改属性" style="padding: 20px;" :show-close="false">
-    <el-form :model="attributeForm" :rules="rules" ref="attributeFormRef" label-width="80px" style="padding: 5px 10px 0px 10px;">
+    <el-form :model="attributeForm" :rules="rules" ref="attributeFormRef" label-width="80px"
+             style="padding: 5px 10px 0px 10px;">
       <el-form-item label="中文名称" prop="name">
         <el-input v-model="attributeForm.name" disabled/>
       </el-form-item>
@@ -119,9 +121,9 @@
       </el-form-item>
       <el-form-item label="类型" prop="type">
         <el-select v-model="attributeForm.type" placeholder="选择属性类型" disabled>
-          <el-option label="TEXT" value="TEXT" />
-          <el-option label="INTEGER" value="INTEGER" />
-          <el-option label="DECIMAL" value="DECIMAL" />
+          <el-option label="TEXT" value="TEXT"/>
+          <el-option label="INTEGER" value="INTEGER"/>
+          <el-option label="DECIMAL" value="DECIMAL"/>
         </el-select>
       </el-form-item>
       <el-form-item v-if="attributeForm.type == 'DECIMAL'" label="精度" prop="precision">
@@ -147,10 +149,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { AttributeService } from '@/services/apiServices'
+import {ref, computed, onMounted} from 'vue'
+import {AttributeService} from '@/services/apiServices'
 import ThePagination from '@/components/ThePagination.vue'
-import { ElMessage } from 'element-plus';
+//import { ElMessage } from 'element-plus';
 
 const attributeData = ref([])
 const filterData = ref({
@@ -173,14 +175,14 @@ const attributeForm = ref({
 })
 const attributeFormRef = ref(null)
 const rules = {
-  name: [{ required: true, message: '中文名称不能为空', trigger: 'blur' }],
+  name: [{required: true, message: '中文名称不能为空', trigger: 'blur'}],
   // description: [{ required: true, message: '中文描述不能为空', trigger: 'blur' }],
-  nameEn: [{ required: true, message: '英文名称不能为空', trigger: 'blur' }],
+  nameEn: [{required: true, message: '英文名称不能为空', trigger: 'blur'}],
   // descriptionEn: [{ required: true, message: '英文描述不能为空', trigger: 'blur' }],
-  type: [{ required: true, message: '类型不能为空', trigger: 'change' }],
-  precision: [{ required: true, message: '精度不能为空', trigger: 'blur' }],
-  length: [{ required: true, message: '长度不能为空', trigger: 'blur' }],
-  disableFlag: [{ required: true, message: '属性状态不能为空', trigger: 'change' }]
+  type: [{required: true, message: '类型不能为空', trigger: 'change'}],
+  precision: [{required: true, message: '精度不能为空', trigger: 'blur'}],
+  length: [{required: true, message: '长度不能为空', trigger: 'blur'}],
+  disableFlag: [{required: true, message: '属性状态不能为空', trigger: 'change'}]
 };
 
 const labelText = computed(() => {
@@ -199,25 +201,25 @@ function handlePageChange(curPage, pageSizes) {
 
 function getAttributes(pageSize, currPage) {
   AttributeService.getAttributes(pageSize, currPage, filterData.value.attribute)
-  .then(({data}) => {
-    attributeData.value = data.data.data
-    // format constraint
-    attributeData.value.forEach(obj => {
-      let str = obj.constraint.replace(/\\/g, '');
-      let tmpConstraint = JSON.parse(obj.constraint)
-      let newConstraint = {
-        type: obj.type
-      }
-      if (obj.type === 'TEXT') {
-        newConstraint.length = tmpConstraint.length
-      } else if (obj.type === 'DECIMAL') {
-        newConstraint.precision = tmpConstraint.precision
-      }
-      obj.constraint = newConstraint
-    });
-    page.value.curPage = data.data.page.curPage
-    page.value.pageSize = data.data.page.pageSize
-  })
+    .then(({data}) => {
+      attributeData.value = data.data.data
+      // format constraint
+      attributeData.value.forEach(obj => {
+        let str = obj.constraint.replace(/\\/g, '');
+        let tmpConstraint = JSON.parse(obj.constraint)
+        let newConstraint = {
+          type: obj.type
+        }
+        if (obj.type === 'TEXT') {
+          newConstraint.length = tmpConstraint.length
+        } else if (obj.type === 'DECIMAL') {
+          newConstraint.precision = tmpConstraint.precision
+        }
+        obj.constraint = newConstraint
+      });
+      page.value.curPage = data.data.page.curPage
+      page.value.pageSize = data.data.page.pageSize
+    })
   AttributeService.getAttributeCount(filterData.value.attribute).then(({data}) => {
     page.value.totalRows = data.data
   })
@@ -387,9 +389,9 @@ onMounted(() => {
   flex-direction: column;
 
   .attribute-wrapper {
-  padding: 0px 10px 0px 10px;
-  height: calc((100% - 115px) * 0.7);
-    
+    padding: 0px 10px 0px 10px;
+    height: calc((100% - 115px) * 0.7);
+
     .el-table {
       height: 100%;
     }
@@ -474,7 +476,7 @@ onMounted(() => {
         font-size: 12px;
       }
     }
-    
+
   }
 
   .pagination {

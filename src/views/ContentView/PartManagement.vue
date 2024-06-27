@@ -30,13 +30,14 @@
         查询
       </el-button>
     </el-container>
-    <el-divider class="divider" />
+    <el-divider class="divider"/>
     <el-button
       class="createButton"
       type="primary"
       :icon="Plus"
       @click="handleCreate"
-      >创建</el-button
+    >创建
+    </el-button
     >
     <el-table
       class="partTable"
@@ -44,11 +45,11 @@
       style="width: 100%"
       height="350"
     >
-      <el-table-column type="index" width="55" fixed="left" />
+      <el-table-column type="index" width="55" fixed="left"/>
       <el-table-column prop="id" label="部件编码" width="180" fixed/>
       <el-table-column prop="name" label="部件名称" width="180"/>
       <el-table-column prop="versionId" label="版本号" width="180"/>
-      <el-table-column  prop="mode" label="装配模式" width="180"/>
+      <el-table-column prop="mode" label="装配模式" width="180"/>
       <el-table-column prop="typeBizCode" label="分类码" width="180"/>
       <el-table-column label="操作" fixed="right" width="120">
         <template #default="{ row }">
@@ -95,13 +96,13 @@
 <script setup>
 import TheBreadcrumb from "@/components/TheBreadcrumb.vue";
 import TheNavMenu from "@/components/TheNavMenu.vue";
-import { reactive, ref } from "vue";
-import { Edit, Delete, Search, Plus } from "@element-plus/icons-vue";
-import { ElMessage, ElMessageBox } from "element-plus";
+import {reactive, ref} from "vue";
+import {Edit, Delete, Search, Plus} from "@element-plus/icons-vue";
+//import { ElMessage, ElMessageBox } from "element-plus";
 import DialogCreatePart from "@/components/DialogCreatePart.vue";
 import router from "@/router";
-import { PartService } from "@/services/apiServices";
-import { onMounted } from "vue";
+import {PartService} from "@/services/apiServices";
+import {onMounted} from "vue";
 // 定义表格数据
 /**
  * id:
@@ -116,12 +117,15 @@ const tableData = ref([]);
 //查询关键词
 const searchKeywordCode = ref("");
 const searchKeywordName = ref("");
+
 function resetName() {
   searchKeywordName.value = "";
 }
+
 function resetCode() {
   searchKeywordCode.value = "";
 }
+
 // 分页，当前页，每页显示条数，总条数 todo: 从后端获取
 const currentPage = ref(1);
 const pageSize = ref(10);
@@ -186,6 +190,7 @@ function handleEdit(row) {
   opType.value = "edit";
   addPart.value.open(row.id);
 }
+
 //删除
 function handleDelete(row) {
   ElMessageBox.confirm("此操作将永久删除该部件, 是否继续?", "提示", {
@@ -250,17 +255,21 @@ function handleCurrentChange(newPage) {
     justify-content: center;
     display: flex;
     margin-bottom: 20px;
+
     .input-with-select {
       margin-right: 20px;
     }
   }
+
   .search-button {
     margin-top: 100px;
   }
+
   .createButton {
     margin-left: 20px;
     margin-bottom: 10px;
   }
+
   .partTable {
     padding-left: 5px;
   }

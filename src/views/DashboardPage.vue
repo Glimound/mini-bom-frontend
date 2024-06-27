@@ -1,8 +1,8 @@
 <template>
   <div class="page">
-    <TheToolbar />
+    <TheToolbar/>
     <div class="main-container">
-      <TheNavMenu />
+      <TheNavMenu/>
       <div class="content-area">
         <!-- <TheBreadcrumb/> -->
         <router-view/>
@@ -27,14 +27,14 @@ import TheToolbar from "@/components/TheToolbar.vue";
     height: calc(100% - 50px);
     width: 100%;
 
-      .content-area {
-        padding: 20px 20px 20px 220px;
-        // overflow-y: auto;
-        // height: auto;
-        height: calc(100% - 40px);
-        // min-height: calc(100% - 40px);
-        background-color: #f2f4f7;
-      }
+    .content-area {
+      padding: 20px 20px 20px 220px;
+      // overflow-y: auto;
+      // height: auto;
+      height: calc(100% - 40px);
+      // min-height: calc(100% - 40px);
+      background-color: #f2f4f7;
     }
   }
+}
 </style>

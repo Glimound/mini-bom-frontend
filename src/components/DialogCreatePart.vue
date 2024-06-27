@@ -67,16 +67,16 @@
                 </el-select>
               </el-form-item>
               <el-form-item label="分类" prop="typeBizCode" required>
-                <el-tree-select  lazy 
-                  :load="loadTypeBizCodeNode" 
-                  :props="treeProps" 
-                  placeholder="请选择分类码" 
-                  check-strictly
-                  v-model="partData.typeBizCode"
-                  value-key="businessCode"
-                  node-key="businessCode"
-                  @node-click="handleComfirmTypeBizCode"
-                  size="small">
+                <el-tree-select lazy
+                                :load="loadTypeBizCodeNode"
+                                :props="treeProps"
+                                placeholder="请选择分类码"
+                                check-strictly
+                                v-model="partData.typeBizCode"
+                                value-key="businessCode"
+                                node-key="businessCode"
+                                @node-click="handleComfirmTypeBizCode"
+                                size="small">
                 </el-tree-select>
               </el-form-item>
             </el-form>
@@ -141,7 +141,7 @@
                   <template #reference>
                     <el-button type="danger" size="small" :icon="Delete"/>
                   </template>
-              </el-popconfirm>
+                </el-popconfirm>
               </template>
             </el-table-column>
           </el-table>
@@ -166,7 +166,7 @@
               <span class="dialog-footer">
                 <el-button @click="handleCloseEditSubitem">取 消</el-button>
                 <el-button type="primary" @click="submitEditSubitem"
-                  >确定</el-button
+                >确定</el-button
                 >
               </span>
             </template>
@@ -206,20 +206,21 @@
                   @click="searchPartList"
                   :icon="Search"
                   size="small"
-                  >查询</el-button
+                >查询
+                </el-button
                 >
               </el-form>
             </div>
-            <el-divider />
+            <el-divider/>
             <div class="partTable">
               <el-table :data="partList" style="width: 100%" max-height="300">
-                <el-table-column type="index" width="21" fixed="left" />
-                <el-table-column prop="id" label="编码" width="190" fixed />
-                <el-table-column prop="name" label="名称" width="120" fixed />
-                <el-table-column prop="versionId" label="版本号" width="50" />
-                <el-table-column prop="mode" label="装配模式" width="150" />
-                <el-table-column prop="typeId" label="分类码" width="200" />
-                <el-table-column prop="source" label="来源" width="150" />
+                <el-table-column type="index" width="21" fixed="left"/>
+                <el-table-column prop="id" label="编码" width="190" fixed/>
+                <el-table-column prop="name" label="名称" width="120" fixed/>
+                <el-table-column prop="versionId" label="版本号" width="50"/>
+                <el-table-column prop="mode" label="装配模式" width="150"/>
+                <el-table-column prop="typeId" label="分类码" width="200"/>
+                <el-table-column prop="source" label="来源" width="150"/>
                 <el-table-column fixed="right" label="操作" width="120">
                   <template #default="scope">
                     <el-popconfirm
@@ -232,7 +233,8 @@
                     >
                       <template #reference>
                         <el-button type="primary" size="small" :icon="Plus"
-                          >添加</el-button
+                        >添加
+                        </el-button
                         >
                       </template>
                     </el-popconfirm>
@@ -240,7 +242,7 @@
                 </el-table-column>
               </el-table>
             </div>
-            <el-divider />
+            <el-divider/>
             <div class="addCounts">
               <el-form :model="bomLinkData" inline ref="bomLinkDataRef">
                 <el-form-item label="数量" prop="quantity">
@@ -269,11 +271,11 @@
               style="width: 100%"
               max-height="300"
             >
-              <el-table-column type="index" width="30" fixed="left" />
-              <el-table-column prop="id" label="编码" width="250" fixed />
-              <el-table-column prop="versionId" label="版本号" width="90" />
-              <el-table-column prop="name" label="名称" width="120" />
-              <el-table-column prop="mode" label="装配模式" width="120" />
+              <el-table-column type="index" width="30" fixed="left"/>
+              <el-table-column prop="id" label="编码" width="250" fixed/>
+              <el-table-column prop="versionId" label="版本号" width="90"/>
+              <el-table-column prop="name" label="名称" width="120"/>
+              <el-table-column prop="mode" label="装配模式" width="120"/>
             </el-table>
           </el-dialog>
         </div>
@@ -286,10 +288,10 @@
           style="width: 100%"
         >
           <!-- 序号，编码（点击编码可以查看详细信息），版本号，名称，操作（删除）-->
-          <el-table-column type="index" width="30" fixed="left" />
-          <el-table-column prop="id" label="编码" width="250" fixed />
-          <el-table-column prop="versionId" label="版本号" width="90" />
-          <el-table-column prop="name" label="名称" width="120" />
+          <el-table-column type="index" width="30" fixed="left"/>
+          <el-table-column prop="id" label="编码" width="250" fixed/>
+          <el-table-column prop="versionId" label="版本号" width="90"/>
+          <el-table-column prop="name" label="名称" width="120"/>
           <el-table-column label="操作" width="150">
             <template #default="scope">
               <el-button
@@ -334,17 +336,17 @@
       </el-tab-pane>
     </el-tabs>
   </el-dialog>
-  <el-drawer title="BOM清单" v-model = "BOMListVisible" :before-close="closeBOMList">
-    <el-tree :props = "bomProps" :load="loadBOMNode" :key="updateTree" lazy/>
+  <el-drawer title="BOM清单" v-model="BOMListVisible" :before-close="closeBOMList">
+    <el-tree :props="bomProps" :load="loadBOMNode" :key="updateTree" lazy/>
   </el-drawer>
 </template>
 
 <script setup>
-import { reactive, ref, watch, onMounted } from "vue";
-import { useRoute } from "vue-router";
-import { ElMessage } from "element-plus";
-import {Plus,Position,View,EditPen,Delete,Search,InfoFilled} from "@element-plus/icons-vue";
-import {PartService,ClassificationService,BOMService} from "@/services/apiServices";
+import {reactive, ref, watch, onMounted} from "vue";
+import {useRoute} from "vue-router";
+import {ElMessage} from "element-plus";
+import {Plus, Position, View, EditPen, Delete, Search, InfoFilled} from "@element-plus/icons-vue";
+import {PartService, ClassificationService, BOMService} from "@/services/apiServices";
 
 const props = defineProps({
   type: String, // 用于判断是添加还是编辑
@@ -355,8 +357,9 @@ function closeDialog(done) {
   close();
   done();
 }
+
 //关闭整个对话框，先重置所有数据,同时标签页指向"基本属性"
-function close(){
+function close() {
   props.reload();
   visible.value = false;
   // 重置属性表单数据
@@ -396,13 +399,13 @@ function handleChangeTab(tab) {
       break;
     case "bom":
       //选择BOM清单时，若子项列表为空，则渲染子项列表
-      if(subitemsData.value.length === 0){
+      if (subitemsData.value.length === 0) {
         fetchSubitems();
       }
       break;
     case "version":
       //选择版本管理时，若历史版本列表为空，渲染历史版本列表
-      if(partVersionList.value.length === 0){
+      if (partVersionList.value.length === 0) {
         getHistoryVersionList();
       }
       break;
@@ -410,6 +413,7 @@ function handleChangeTab(tab) {
       break;
   }
 }
+
 //默认显示 基本属性标签页 下的 基本属性面板
 const activeName = ref(["1"]);
 /**
@@ -469,7 +473,8 @@ const treeProps = ref({
     return data.leafFlag
   },
 });
-function loadTypeBizCodeNode(node,resolve){
+
+function loadTypeBizCodeNode(node, resolve) {
   if (node && node.level == 0) {
     ClassificationService.getTreeRoots().then(({data}) => {
       resolve(data.data)
@@ -478,22 +483,23 @@ function loadTypeBizCodeNode(node,resolve){
     ClassificationService.getNodeChildren(node.data.id).then(({data}) => {
       resolve(data.data)
     })
-  }
-  else {
+  } else {
     resolve([])
   }
 }
-function handleComfirmTypeBizCode(node){
+
+function handleComfirmTypeBizCode(node) {
   partData.value.classificationId = node.id;
 }
+
 // 获取分类码对应的属性，并动态生成表单项
 function fetchAttributes(classificationId) {
   // 如果处于编辑模式,则获取当前部件的属性
   if (props.type === "edit") {
     ClassificationService.getRelevantAttributes(classificationId)
       .then((res) => {
-        if (classificationId === ""|| (res.data.data.parentAttrs.length === 0 &&
-           res.data.data.selfAttrs.length === 0)
+        if (classificationId === "" || (res.data.data.parentAttrs.length === 0 &&
+          res.data.data.selfAttrs.length === 0)
         ) {
           return;
         }
@@ -592,7 +598,7 @@ function getDetail(id) {
   });
 }
 
-function handleCloseTab(activeName, oldActiveName){
+function handleCloseTab(activeName, oldActiveName) {
   console.log("closeTab")
   props.type = "add"
 }
@@ -645,7 +651,7 @@ const subitemsData = ref([]);
 const subitem = ref({
   bomLinkId: "",
   buoId: "",
-  quantity:Number(null),
+  quantity: Number(null),
   referenceDesignator: "",
 });
 //新增子项、编辑子项的弹窗是否显示 (两个弹窗不同！)
@@ -667,7 +673,7 @@ const bomLinkDataRef = ref(null);
 //BOM清单弹窗
 const BOMListVisible = ref(false);
 const bomProps = ref({
-  label:(data) =>{
+  label: (data) => {
     return `${data.name}`
   },
 });
@@ -683,6 +689,7 @@ const resetName = () => {
 const resetId = () => {
   searchById.value = "";
 };
+
 //刷新子项列表
 function fetchSubitems() {
   BOMService.getSubitems(partData.value.id)
@@ -693,8 +700,9 @@ function fetchSubitems() {
       ElMessage.error("获取子项失败" + error.message);
     });
 }
+
 //编辑子项
-function handleEditSubitem(row){
+function handleEditSubitem(row) {
   //将选中的子项数据赋值给subitem
   subitem.value.bomLinkId = row.bomLinkId;
   subitem.value.buoId = row.buoId;
@@ -703,6 +711,7 @@ function handleEditSubitem(row){
   //打开编辑子项的对话框
   editSubitemVisible.value = true;
 }
+
 //提交编辑子项的表单
 function submitEditSubitem() {
   subitem.value.quantity = Number(subitem.value.quantity);
@@ -732,18 +741,20 @@ function handleCloseEditSubitem(done) {
   };
   done();
 }
+
 //删除子项
-function handleDeleteSubitem(row){
+function handleDeleteSubitem(row) {
   BOMService.deleteBom(row.bomLinkId, row.buoId)
     .then((res) => {
-      if(res.data.message === "ok"){
+      if (res.data.message === "ok") {
         ElMessage.success("删除成功");
         fetchSubitems();
-      }else{
+      } else {
         ElMessage.error("删除失败:" + res.data.message);
       }
     })
 }
+
 //添加子项 --提交表单
 function comfirmAddSubitem(row) {
   //将选中的Part数据添加到关联数据中
@@ -770,6 +781,7 @@ function comfirmAddSubitem(row) {
       ElMessage.error("外部错误:" + error.message);
     });
 }
+
 //关闭对话框时，重置表单数据,同时刷新该Part的子项列表
 function handleCloseAddSubitemDialog(done) {
   queryType.value = 2;
@@ -780,6 +792,7 @@ function handleCloseAddSubitemDialog(done) {
   fetchSubitems();
   done();
 }
+
 //查询Part列表
 function searchPartList() {
   if (queryType.value === 1) {
@@ -791,43 +804,46 @@ function searchPartList() {
       }
     });
   } else {
-    PartService.getPartsForBom(partData.value.id,searchByName.value).then((res) => {
+    PartService.getPartsForBom(partData.value.id, searchByName.value).then((res) => {
       partList.value = res.data.data.data;
     });
   }
 }
+
 //点击“新增子项后”，展开对话框并查询Part列表
 function handleAddSubItem() {
   addSubitemVisible.value = true;
   searchPartList();
 }
+
 //点击查看BOM清单
 function searchBOMLists() {
   updateTree.value++;
   BOMListVisible.value = true;
 }
+
 //加载BOM节点
-function loadBOMNode(node,resolve){
-  if(node.level === 0){
-    resolve([{name:partData.value.name}]);
-  }
-  else if(node.level === 1){
+function loadBOMNode(node, resolve) {
+  if (node.level === 0) {
+    resolve([{name: partData.value.name}]);
+  } else if (node.level === 1) {
     BOMService.getSubitems(partData.value.id)
-    .then(({data}) => {
-      resolve(data.data);
-    })
-  }
-  else if(node.level > 1){
+      .then(({data}) => {
+        resolve(data.data);
+      })
+  } else if (node.level > 1) {
     BOMService.getSubitems(node.data.subjectId)
-    .then(({data}) => {
-      resolve(data.data);
-    })
-  } 
+      .then(({data}) => {
+        resolve(data.data);
+      })
+  }
 }
-function closeBOMList(done){
+
+function closeBOMList(done) {
   BOMListVisible.value = false;
   done();
 }
+
 //查看父项
 function searchParent() {
   BOMService.getParents(partData.value.masterId)
@@ -839,8 +855,6 @@ function searchParent() {
       ElMessage.error("获取父项失败" + error.message);
     });
 }
-
-
 
 
 /**
@@ -887,18 +901,21 @@ function handleDeleteVersion(row) {
       ElMessage.error("删除失败: " + error.message);
     });
 }
+
 //向外暴露的方法
-defineExpose({ open, close });
+defineExpose({open, close});
 </script>
 
 <style lang="scss">
 .dialog-footer {
   display: flex;
   justify-content: flex-end;
-  padding:10px;
+  padding: 10px;
+
   .cancel {
     margin-right: 10px;
   }
+
   .submitPart {
     margin-right: 10px;
   }

@@ -2,15 +2,21 @@
   <div class="navigation">
     <el-menu :default-active="currentRoute" :router="true">
       <el-menu-item index="/attribute-management">
-        <el-icon size="16"><Setting /></el-icon>
+        <el-icon size="16">
+          <Setting/>
+        </el-icon>
         <span>属性管理</span>
       </el-menu-item>
       <el-menu-item index="/classification-management">
-        <el-icon size="16"><Document /></el-icon>
+        <el-icon size="16">
+          <Document/>
+        </el-icon>
         <span>分类管理</span>
       </el-menu-item>
       <el-menu-item index="/part-management">
-        <el-icon size="16"><Connection /></el-icon>
+        <el-icon size="16">
+          <Connection/>
+        </el-icon>
         <span>Part&BOM管理</span>
       </el-menu-item>
     </el-menu>
@@ -18,8 +24,9 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { useRoute } from "vue-router";
+import {computed} from "vue";
+import {useRoute} from "vue-router";
+
 const route = useRoute();
 
 const currentRoute = computed(() => {

@@ -1,6 +1,6 @@
 <template>
   <div class="blank-wrapper">
-    <el-empty description="暂无内容" />
+    <el-empty description="暂无内容"/>
   </div>
 </template>
 
